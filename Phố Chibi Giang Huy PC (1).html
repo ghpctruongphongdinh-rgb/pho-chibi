@@ -1,0 +1,1082 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Phố Chibi Giang Huy PC</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style>
+/* Bố cục: toàn màn hình là thế giới 3D, giao diện nổi kiểu sticker viền đậm; đồ họa chibi pastel. */
+:root {
+  --sky: #bfe8ff;
+  --pink: #ff8fb8;
+  --mint: #7fe3c9;
+  --butter: #ffd666;
+  --lilac: #b9a6ff;
+  --ink: #3b3355;
+  --card: #fffaf6;
+  --muted: #7a7094;
+  --font-display: 'Baloo 2', 'Be Vietnam Pro', system-ui, sans-serif;
+  --font-body: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: light;
+}
+html { height: 100%; box-sizing: border-box; }
+body {
+  height: 100%; overflow: hidden; background: var(--sky); color: var(--ink);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+}
+#app {
+  position: relative; height: 100%; overflow: hidden;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 14px;
+  user-select: none; -webkit-user-select: none;
+}
+#gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+#hud { position: relative; height: 100%; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
+#hud > * { pointer-events: none; }
+#hud button, #hud a, #stick { pointer-events: auto; }
+.top, .bottom { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.bottom { align-items: flex-end; flex-wrap: nowrap; }
+.col { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; min-width: 0; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.sticker { background: var(--card); color: var(--ink); border: 2.5px solid var(--ink); border-radius: 16px; box-shadow: 0 3px 0 var(--ink); }
+.brand { padding: 6px 14px; font: 800 18px/1.1 var(--font-display); display: flex; align-items: center; gap: 8px; }
+.brand i { width: 14px; height: 14px; border-radius: 50%; background: var(--pink); border: 2.5px solid var(--ink); flex: none; }
+.pill { padding: 3px 12px; font: 600 13px var(--font-body); border-radius: 999px; }
+.btn {
+  font: 800 15px var(--font-display); padding: 8px 16px; border-radius: 999px; border: 2.5px solid var(--ink);
+  background: var(--butter); color: var(--ink); box-shadow: 0 3px 0 var(--ink); cursor: pointer; text-decoration: none;
+  display: inline-block; line-height: 1.2; user-select: none;
+}
+.btn:hover, .btn:focus-visible { filter: brightness(1.06); outline: 3px solid var(--ink); outline-offset: 2px; }
+.btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+.btn.pink { background: var(--pink); }
+.btn.mint { background: var(--mint); }
+.btn.ghost { background: var(--card); }
+
+#stick { width: 124px; height: 124px; border-radius: 50%; background: rgba(255, 250, 246, .55); border: 2.5px solid var(--ink); position: relative; touch-action: none; display: none; flex: none; }
+#knob { position: absolute; left: 36px; top: 36px; width: 52px; height: 52px; border-radius: 50%; background: var(--pink); border: 2.5px solid var(--ink); box-shadow: 0 3px 0 var(--ink); }
+.mid { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+#hint { padding: 6px 14px; font-size: 13px; text-align: center; transition: opacity .6s; }
+#toast { padding: 8px 16px; max-width: min(420px, 100%); text-align: left; transition: opacity .25s; }
+#toast b { font-family: var(--font-display); font-weight: 800; color: #e0457d; margin-right: 6px; }
+#act { font-size: 18px; padding: 12px 22px; max-width: 46vw; text-align: center; flex: none; }
+#act kbd { font: 700 12px var(--font-body); background: var(--card); border: 2px solid var(--ink); border-radius: 6px; padding: 0 6px; margin-left: 6px; }
+#fade { position: absolute; inset: 0; background: #fff1f6; opacity: 0; pointer-events: none; transition: opacity .26s; z-index: 15; }
+
+.overlay { position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; overflow: auto;
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: rgba(59, 51, 85, .42); }
+#prodOv { z-index: 26; }
+.card { width: min(640px, 100%); padding: 18px; position: relative; display: flex; flex-direction: column; gap: 12px; user-select: text; -webkit-user-select: text; }
+.card h1, .card h2 { font-family: var(--font-display); font-weight: 800; margin: 0; line-height: 1.05; text-wrap: balance; }
+.card h1 { font-size: clamp(2rem, 7vw, 2.8rem); }
+.card h2 { font-size: 1.5rem; }
+.card p { margin: 0; }
+.sub { color: var(--muted); font-size: 14px; }
+.close { position: absolute; right: 14px; top: 14px; padding: 5px 12px; font-size: 14px; }
+.card h2 { padding-right: 72px; }
+.picks { display: flex; gap: 10px; flex-wrap: wrap; }
+.pick { border: 2.5px solid var(--ink); background: var(--card); border-radius: 14px; padding: 8px 12px; font: 700 14px var(--font-body); color: var(--ink); cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 3px 0 var(--ink); }
+.pick i { width: 22px; height: 22px; border-radius: 50%; border: 2.5px solid var(--ink); display: block; }
+.pick[aria-pressed="true"] { background: var(--butter); }
+.pick:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.keys { color: var(--muted); font-size: 13px; }
+.pcols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 16px; align-items: start; }
+.art { background: #f3ecff; border: 2.5px solid var(--ink); border-radius: 14px; padding: 10px; }
+.art svg { width: 100%; height: auto; display: block; }
+.price { font: 800 1.9rem/1 var(--font-display); color: #e0457d; margin: 4px 0 8px; }
+.cat { display: inline-block; background: var(--mint); border: 2px solid var(--ink); border-radius: 999px; padding: 0 10px; font: 700 12px var(--font-body); margin-bottom: 6px; }
+.specs { margin: 0 0 12px; padding-left: 18px; }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.small { font-size: 13px; color: var(--muted); margin-top: 8px !important; }
+.small b { color: var(--ink); user-select: all; }
+.list { display: flex; flex-direction: column; gap: 8px; max-height: 56vh; overflow: auto; padding: 2px 4px 6px 2px; }
+.item { display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 2.5px solid var(--ink); border-radius: 14px; padding: 8px 12px; background: #fff; }
+.item div { min-width: 0; }
+.item b { font-family: var(--font-display); font-size: 17px; display: block; }
+.item span { color: var(--muted); font-size: 13px; }
+.chatlog { display: flex; flex-direction: column; gap: 8px; max-height: 34vh; min-height: 96px; overflow: auto; padding: 10px; background: #fff; border: 2.5px solid var(--ink); border-radius: 14px; }
+.msg { max-width: 86%; padding: 7px 12px; border-radius: 16px; border: 2px solid var(--ink); font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+.msg.bot { align-self: flex-start; background: #ffe9f1; border-bottom-left-radius: 4px; }
+.msg.me { align-self: flex-end; background: #d9f7ee; border-bottom-right-radius: 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: 600 13px var(--font-body); color: var(--ink); background: var(--card); border: 2px solid var(--ink); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+.chip:hover, .chip:focus-visible { background: var(--butter); outline: none; }
+.chatform { display: flex; gap: 8px; }
+.chatform input { flex: 1; min-width: 0; font: 500 15px var(--font-body); color: var(--ink); background: #fff; border: 2.5px solid var(--ink); border-radius: 999px; padding: 8px 14px; user-select: text; -webkit-user-select: text; }
+.chatform input:focus-visible { outline: 3px solid var(--butter); outline-offset: 1px; }
+.info { display: grid; gap: 6px; }
+.info b { user-select: all; }
+@media (max-width: 560px) {
+  .pcols { grid-template-columns: minmax(0, 1fr); }
+  #act { font-size: 16px; padding: 10px 16px; }
+  .brand { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { #fade, #hint, #toast { transition: none; } }
+</style>
+
+<div id="app">
+  <canvas id="gl"></canvas>
+  <div id="fade"></div>
+
+  <div id="hud">
+    <div class="top">
+      <div class="col">
+        <div class="sticker brand"><i></i>Phố Chibi Giang Huy PC</div>
+        <div class="sticker pill" id="loc">Quảng trường</div>
+        <div class="row">
+          <div class="sticker pill" id="starChip">Sao 0/12</div>
+          <div class="sticker pill" id="seenChip">Đã xem 0 sản phẩm</div>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn mint" id="mapBtn" type="button">Bản đồ</button>
+        <button class="btn" id="contactBtn" type="button">Liên hệ</button>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <div id="stick" aria-label="Cần điều khiển"><div id="knob"></div></div>
+      <div class="mid">
+        <div class="sticker" id="toast" style="opacity:0" aria-live="polite"></div>
+        <div class="sticker" id="hint">WASD hoặc phím mũi tên để đi, kéo chuột để xoay, bấm E để tương tác</div>
+      </div>
+      <button class="btn pink" id="act" type="button" hidden></button>
+    </div>
+  </div>
+
+  <div class="overlay" id="startOv">
+    <div class="card sticker" role="dialog" aria-modal="true" aria-labelledby="stTitle">
+      <h1 id="stTitle">Phố Chibi Giang Huy PC</h1>
+      <p class="sub">Dạo quanh thành phố nhỏ xinh, ghé 8 cửa hàng và xem laptop, PC gaming, camera, màn hình thật của Giang Huy PC. Nhặt đủ 12 ngôi sao trên phố nhé.</p>
+      <div>
+        <p class="sub" style="margin-bottom:6px">Chọn nhân vật của bạn</p>
+        <div class="picks" id="picks"></div>
+      </div>
+      <button class="btn pink" id="startBtn" type="button" style="align-self:flex-start;font-size:18px;padding:10px 24px">Bắt đầu dạo phố</button>
+      <p class="keys">Máy tính: WASD hoặc phím mũi tên để đi, kéo chuột để xoay camera, E để tương tác, bấm vào mặt đường để đi tới đó. Điện thoại: dùng cần điều khiển bên trái, kéo màn hình để xoay.</p>
+    </div>
+  </div>
+
+  <div class="overlay" id="prodOv" hidden>
+    <div class="card sticker" role="dialog" aria-modal="true" aria-labelledby="prName">
+      <button class="btn ghost close" id="prClose" type="button">Đóng</button>
+      <div class="pcols">
+        <div class="art" id="prArt"></div>
+        <div>
+          <span class="cat" id="prCat"></span>
+          <h2 id="prName"></h2>
+          <p class="price" id="prPrice"></p>
+          <ul class="specs" id="prSpec"></ul>
+          <div class="btns">
+            <a class="btn pink" id="prLink" target="_blank" rel="noopener" href="#">Xem trên gianghuypc.vn</a>
+            <a class="btn" id="prZalo" target="_blank" rel="noopener" href="#">Nhắn Zalo</a>
+          </div>
+          <p class="small">Hotline <b id="prHot"></b>. Giá và tình trạng hàng theo website, vui lòng xác nhận khi đặt mua.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="mapOv" hidden>
+    <div class="card sticker" role="dialog" aria-modal="true" aria-labelledby="mapTitle">
+      <button class="btn ghost close" id="mapClose" type="button">Đóng</button>
+      <h2 id="mapTitle">Bản đồ phố</h2>
+      <p class="sub">Chọn một cửa hàng để chạy thẳng tới cửa.</p>
+      <div class="list" id="mapList"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="chatOv" hidden>
+    <div class="card sticker" role="dialog" aria-modal="true" aria-labelledby="chName">
+      <button class="btn ghost close" id="chClose" type="button">Đóng</button>
+      <div>
+        <h2 id="chName">Nhân viên</h2>
+        <p class="sub" id="chShop"></p>
+      </div>
+      <div class="chatlog" id="chLog" aria-live="polite"></div>
+      <div class="chips" id="chChips"></div>
+      <form class="chatform" id="chForm" autocomplete="off">
+        <input id="chInput" type="text" maxlength="300" placeholder="Nhập câu hỏi của bạn..." aria-label="Nhập tin nhắn cho nhân viên">
+        <button class="btn pink" type="submit">Gửi</button>
+      </form>
+      <div>
+        <p class="sub" style="margin-bottom:6px">Muốn trao đổi trực tiếp với nhân viên thật? Chọn một kênh, nội dung bạn vừa nhập sẽ được sao chép sẵn để dán vào khung chat.</p>
+        <div class="btns">
+          <a class="btn pink" id="chFb" target="_blank" rel="noopener" href="#">Nhắn Fanpage Facebook</a>
+          <a class="btn mint" id="chZalo" target="_blank" rel="noopener" href="#">Chuyển sang Zalo</a>
+        </div>
+        <p class="small" id="chNote">Hotline <b id="chHot"></b></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="contactOv" hidden>
+    <div class="card sticker" role="dialog" aria-modal="true" aria-labelledby="ctTitle">
+      <button class="btn ghost close" id="ctClose" type="button">Đóng</button>
+      <h2 id="ctTitle">Giang Huy PC</h2>
+      <p class="sub">Máy tính văn phòng, PC gaming, laptop, camera, linh phụ kiện chính hãng.</p>
+      <div class="info" id="ctInfo"></div>
+      <div class="btns">
+        <a class="btn pink" id="ctZalo" target="_blank" rel="noopener" href="#">Nhắn Zalo</a>
+        <a class="btn mint" id="ctMsg" target="_blank" rel="noopener" href="#">Messenger</a>
+        <a class="btn" id="ctSite" target="_blank" rel="noopener" href="#">Mở website</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+'use strict';
+const T = THREE;
+const $ = (s) => document.querySelector(s);
+
+/* ================= DỮ LIỆU THẬT TỪ gianghuypc.vn ================= */
+const SHOP = {
+  hotline: '0888.888.126', zalo: 'https://zalo.me/0888888126', messenger: 'https://m.me/gianghuypc', fanpage: 'https://www.facebook.com/gianghuypc',
+  email: 'cskh@gianghuypc.vn', address: '128 Trần Đăng Ninh, phường Tam Thanh, tỉnh Lạng Sơn', site: 'https://gianghuypc.vn'
+};
+const PR = {
+  pc1: { k: 'pc', cat: 'PC Gaming', short: 'PC Gaming Vega 7', name: 'PC Gaming PCAP EVO GM Starter Vega 7', price: '15.800.000₫', spec: ['AMD Ryzen 5 5600GT', 'RAM 16GB, SSD 256GB', 'FreeDOS'], url: 'https://gianghuypc.vn/pc-gaming-pcap-evo-gm-starter-vega-7-amd-ryzen-5-5600gt-ram-16gb-ssd-256gb-freedos-pcapgm03' },
+  pc2: { k: 'pc', cat: 'PC Gaming', short: 'PC Gaming Vega 11', name: 'PC Gaming PCAP EVO GM Starter Vega 11', price: '14.680.000₫', spec: ['AMD Ryzen 5 3400G', 'RAM 16GB, SSD 512GB', 'FreeDOS'], url: 'https://gianghuypc.vn/pc-gaming-pcap-evo-gm-starter-vega-11-amd-ryzen-5-3400g-ram-16gb-ssd-512gb-freedos-pcapgm07' },
+  pc3: { k: 'pc', cat: 'PC Gaming', short: 'PC Gaming RTX 3050', name: 'PC Gaming PCAP EVO GM Advanced RTX 3050 6GB', price: '19.600.000₫', spec: ['AMD Ryzen 5 5500, RTX 3050 6GB', 'RAM 16GB, SSD 512GB', 'FreeDOS'], url: 'https://gianghuypc.vn/pc-gaming-pcap-evo-gm-advanced-rtx-3050-6gb-amd-ryzen-5-5500-ram-16gb-ssd-512gb-freedos-pcapad03' },
+  pc4: { k: 'pc', cat: 'PC Gaming', short: 'PC Gaming RTX 5060', name: 'PC Gaming PCAP EVO GM Performance RTX 5060 8GB', price: '29.600.000₫', spec: ['Intel Core i5 14400F, RTX 5060 8GB', 'RAM 16GB, SSD 512GB', 'FreeDOS'], url: 'https://gianghuypc.vn/pc-gaming-pcap-evo-gm-performance-rtx-5060-8gb-intel-core-i5-14400f-ram-16gb-ssd-512gb-freedos-pcappf05' },
+  pc5: { k: 'pc', cat: 'PC Gaming', short: 'PC Gaming RTX 5060 Ti', name: 'PC Gaming PCAP EVO GM Performance RTX 5060 Ti 8GB', price: '32.800.000₫', spec: ['Intel Core i5 14400F, RTX 5060 Ti 8GB', 'RAM 16GB, SSD 512GB', 'FreeDOS'], url: 'https://gianghuypc.vn/giang-huy-pc-gaming-pcap-evo-gm-performance-rtx-5060-ti-8gb-intel-core-i5-14400f-ram-16gb-ssd-512gb-freedos-pcappf06' },
+  lap1: { k: 'laptop', cat: 'Laptop', short: 'LG Gram 15U50U', name: 'Laptop LG Gram Book 15U50U-G.AV55A5', price: '24.899.999₫', spec: ['Intel Core Ultra 5 115U', 'Màn 15.6 inch FHD, RAM 16GB, SSD 512GB', 'Windows 11 Home'], url: 'https://gianghuypc.vn/laptop-lg-gram-book-15u50u-g-av55a5-intel-core-ultra5-115u-intel-graphics-15-6-inch-fhd-16gb-512gb-windows-11-home-bac' },
+  lap2: { k: 'laptop', cat: 'Laptop', short: 'Gigabyte AERO X16', name: 'Laptop Gigabyte AERO X16 1VH93VNC94DH', price: '40.900.000₫', spec: ['AMD Ryzen AI 7 350, RTX 5060 8GB', 'Màn 16 inch WQXGA, RAM 16GB, SSD 1TB', 'Windows 11 Home'], url: 'https://gianghuypc.vn/laptop-gigabyte-aero-x16-1vh93vnc94dh-amd-ryzen-ai-7-350-rtx-5060-8gb-gddr7-16-inch-wqxga-16gb-1tb-windows-11-home-sl-trang' },
+  lap3: { k: 'laptop', cat: 'Laptop', short: 'MSI Cyborg 15 Max', name: 'Laptop MSI Cyborg 15 Max C13WE-422VN', price: '37.800.000₫', spec: ['Intel Core i7-13620H, RTX 5050', 'Màn 15.6 inch FHD 144Hz', 'RAM 16GB, SSD 512GB, Windows 11'], url: 'https://gianghuypc.vn/laptop-msi-cyborg-15-max-c13we-422vn-intel-core-i7-13620h-rtx-5050-15-6-inch-fhd-144hz-16gb-512gb-win-11-xam' },
+  lap4: { k: 'laptop', cat: 'Laptop', short: 'MSI Cyborg 15 RTX 5050', name: 'Laptop MSI Cyborg 15 C13WEO-417VN', price: '33.990.000₫', spec: ['Intel Core i7-13620H, RTX 5050 8GB', 'Màn 15.6 inch FHD 144Hz', 'RAM 16GB, SSD 512GB, Windows 11'], url: 'https://gianghuypc.vn/laptop-msi-cyborg-15-c13weo-417vn-intel-core-i7-13620h-rtx-5050-8gb-15-6-inch-fhd-144hz-16gb-512gb-win-11-xam' },
+  lap5: { k: 'laptop', cat: 'Laptop', short: 'MSI Cyborg 15 Black', name: 'Laptop MSI Cyborg 15 Black Edition A13VEO-2608VN', price: '31.680.000₫', spec: ['Intel Core i7-13620H, RTX 4050 6GB', 'Màn 15.6 inch FHD 144Hz', 'RAM 16GB, SSD 512GB, Windows 11'], url: 'https://gianghuypc.vn/laptop-msi-cyborg-15-black-edition-a13veo-2608vn-intel-core-i7-13620h-rtx-4050-6gb-15-6-inch-fhd-144hz-16gb-512gb-win-11-den' },
+  cam1: { k: 'camera', cat: 'Camera', short: 'Camera S7DP 5MP', name: 'Camera S7DP (5MP) xoay 360, cam 2 mắt, zoom 12x', price: '1.350.000₫', spec: ['5MP, xoay 360 độ', 'Camera 2 mắt, zoom 12x'], url: 'https://gianghuypc.vn/s7dp-5mp-xoay-360-cam-2-mat-zoom-12x' },
+  cam2: { k: 'camera', cat: 'Camera', short: 'Camera S7XFP 8MP', name: 'Camera S7XFP (8MP) xoay 360, cam 2 mắt, Aurora đêm như ngày', price: '1.650.000₫', spec: ['8MP, xoay 360 độ, camera 2 mắt', 'Công nghệ Aurora, có màu ban đêm', 'Đèn xanh đỏ báo động, đàm thoại 2 chiều'], url: 'https://gianghuypc.vn/s7xfp-8mp-xoay-360-cam-2-mat-cong-nghe-aurora-dem-nhu-ngay-co-den-xanh-do-bao-dong-co-mau-dem-dam-thoai-2-chieu' },
+  cam3: { k: 'camera', cat: 'Camera', short: 'Camera S7XEP 10MP', name: 'Camera S7XEP (10MP) xoay 360, cam 2 mắt', price: '1.550.000₫', spec: ['10MP, xoay 360 độ, camera 2 mắt', 'Có màu ban đêm', 'Đèn xanh đỏ báo động, đàm thoại 2 chiều'], url: 'https://gianghuypc.vn/s7xep-10mp-xoay-360-cam-2-mat-co-den-xanh-do-bao-dong-co-mau-dem-dam-thoai-2-chieu' },
+  cam4: { k: 'camera', cat: 'Camera', short: 'Camera S7XEP 6MP', name: 'Camera S7XEP (6MP) xoay 360, cam 2 mắt', price: '1.350.000₫', spec: ['6MP, xoay 360 độ, camera 2 mắt', 'Có màu ban đêm', 'Đèn xanh đỏ báo động, đàm thoại 2 chiều'], url: 'https://gianghuypc.vn/s7xep-6mp-xoay-360-cam-2-mat-co-den-xanh-do-bao-dong-co-mau-dem-dam-thoai-2-chieu' },
+  cam5: { k: 'camera', cat: 'Camera', short: 'Camera U7LP 6MP', name: 'Camera U7LP (6MP) Titan xoay 360, Aurora đêm như ngày', price: '1.400.000₫', spec: ['6MP Titan, xoay 360 độ', 'Công nghệ Aurora, có màu ban đêm', 'Đèn báo động, đàm thoại 2 chiều'], url: 'https://gianghuypc.vn/u7lp-6mp-titan-xoay-360-cong-nghe-aurora-dem-nhu-ngay-co-den-xanh-do-bao-dong-co-mau-dem-dam-thoai-2-chieu' },
+  cam6: { k: 'camera', cat: 'Camera', short: 'Camera K7FP 5MP', name: 'Camera K7FP (5MP) xoay 360', price: '1.000.000₫', spec: ['5MP, xoay 360 độ', 'Có màu ban đêm', 'Đèn xanh đỏ báo động, đàm thoại 2 chiều'], url: 'https://gianghuypc.vn/k7fp-5mp-xoay-360-co-den-xanh-do-bao-dong-co-mau-dem-dam-thoai-2-chieu' },
+  mon1: { k: 'monitor', cat: 'Màn hình', short: 'ASUS TUF VG279Q5R', name: 'Màn hình Gaming ASUS TUF VG279Q5R', price: '3.999.000₫', spec: ['27 inch, IPS, FHD', '200Hz, 0.3ms, có loa'], url: 'https://gianghuypc.vn/man-hinh-gaming-asus-tuf-vg279q5r-27-inch-ips-fhd-200hz-0-3ms-speaker' },
+  mon2: { k: 'monitor', cat: 'Màn hình', short: 'ASUS VA279QG', name: 'Màn hình ASUS VA279QG', price: '2.990.000₫', spec: ['27 inch, IPS, FHD', '120Hz, 1ms, có loa'], url: 'https://gianghuypc.vn/man-hinh-asus-va279qg-27-inch-ips-fhd-120hz-1ms-speaker' },
+  mon3: { k: 'monitor', cat: 'Màn hình', short: 'ASUS ProArt PA278QEV', name: 'Màn hình đồ họa ASUS ProArt PA278QEV', price: '7.800.000₫', spec: ['27 inch, IPS, 2K', '75Hz, 5ms'], url: 'https://gianghuypc.vn/man-hinh-do-hoa-asus-proart-pa278qev-27-inch-ips-2k-75hz-5ms' },
+  mon4: { k: 'monitor', cat: 'Màn hình', short: 'ASUS ROG XG27ACSR', name: 'Màn hình Gaming ASUS ROG Strix XG27ACSR', price: '6.800.000₫', spec: ['27 inch, IPS, 2K', '220Hz, 1ms, USB Type-C'], url: 'https://gianghuypc.vn/man-hinh-gaming-asus-rog-strix-xg27acsr-27-inch-ips-2k-1ms-220hz-usb-typec' },
+  mon5: { k: 'monitor', cat: 'Màn hình', short: 'ASUS ProArt PA248QFV', name: 'Màn hình đồ họa ASUS ProArt PA248QFV', price: '5.200.000₫', spec: ['24.1 inch, IPS, WUXGA', '100Hz, 5ms, có loa'], url: 'https://gianghuypc.vn/man-hinh-do-hoa-asus-proart-pa248qfv-24-1-inch-ips-wuxga-100hz-5ms-speaker' },
+  off1: { k: 'office', cat: 'PC Văn phòng', short: 'PC Văn Phòng 10', name: 'Giang Huy PC Văn Phòng 10', price: '17.810.000₫', spec: ['Intel Core i7-13650HX', 'RAM 16GB, SSD 512GB', 'Windows 11 bản quyền'], url: 'https://gianghuypc.vn/giang-huy-pc-van-phong-10-intel-core-i7-13650hx-ram-16gb-ssd-512gb-windows-11-ban-quyen' },
+  off2: { k: 'office', cat: 'PC Văn phòng', short: 'PC Văn Phòng 06', name: 'Giang Huy PC Văn Phòng 06', price: '15.000.000₫', spec: ['Intel Core i5 12400', 'RAM 16GB, SSD 512GB', 'Windows 11 bản quyền'], url: 'https://gianghuypc.vn/giang-huy-pc-van-phong-06-intel-core-i5-12400-ram-16gb-ssd-512gb-win-11-ban-quyen' },
+  off3: { k: 'office', cat: 'PC Văn phòng', short: 'PC Văn Phòng 08', name: 'Giang Huy PC Văn Phòng 08', price: '10.400.000₫', spec: ['AMD Ryzen 5 3400G', 'RAM 8GB, SSD 512GB', 'Windows 11 Home'], url: 'https://gianghuypc.vn/giang-huy-pc-van-phong-08-amd-ryzen-5-3400g-ram-8gb-ssd-512gb-windows-11-home' }
+};
+
+/* ================= CỬA HÀNG ================= */
+const SHOPS = [
+  { id: 'gaming', name: 'Giang Huy PC Gaming', desc: 'PC gaming lắp sẵn, card RTX đời mới', side: 'N', x: -33, color: 0xff8fb8, trim: 0xffffff, roofC: 0xff6f9f, roof: 'gable', mascot: 'pc', bg: 0xffe9f1, wall: 0xffc2da, floorA: 0xfff0f6, floorB: 0xffdbe9, kind: 'tech', ped: 'pillar', products: ['pc1', 'pc2', 'pc3', 'pc4', 'pc5'], staff: { hair: 0x3b3355, shirt: 0xff8fb8, pants: 0x3b3355, style: 'cap', hat: 0xff6f9f }, decor: 'Ghế gaming êm như mây, ngồi là không muốn dậy!',
+    lines: ['Chào bạn! Bên mình lắp PC gaming theo ngân sách, bạn muốn chơi game gì?', 'Bấm vào bệ trưng bày để xem giá và thông số thật nhé.', 'Cần tư vấn cứ gọi hotline ' + SHOP.hotline + ' nha!'] },
+  { id: 'laptop', name: 'Giang Huy Laptop', desc: 'Laptop mỏng nhẹ và laptop gaming', side: 'N', x: -11, color: 0xb9a6ff, trim: 0xffffff, roofC: 0x8f7bff, roof: 'dome', mascot: 'laptop', bg: 0xf1ebff, wall: 0xd9cdff, floorA: 0xf6f2ff, floorB: 0xe4dcff, kind: 'tech', ped: 'pillar', products: ['lap1', 'lap2', 'lap3', 'lap4', 'lap5'], staff: { hair: 0x5b3a4a, shirt: 0xb9a6ff, pants: 0x3b3355, style: 'bun' }, decor: 'Túi lười màu tím, ngồi thử laptop thoải mái luôn.',
+    lines: ['Chào bạn! Bạn tìm laptop học tập hay laptop chơi game?', 'Mỗi chiếc đều có link xem chi tiết trên website.', 'Nhắn Zalo cho bên mình để được báo giá nhanh nhé!'] },
+  { id: 'camera', name: 'Giang Huy Camera', desc: 'Camera xoay 360, đàm thoại 2 chiều', side: 'N', x: 11, color: 0x7fe3c9, trim: 0xffffff, roofC: 0x4cc9a8, roof: 'flat', mascot: 'camera', bg: 0xe6fff7, wall: 0xbff3e4, floorA: 0xf0fffa, floorB: 0xd6f7ec, kind: 'tech', ped: 'pillar', products: ['cam1', 'cam2', 'cam3', 'cam4', 'cam5', 'cam6'], staff: { hair: 0x2f2f4a, shirt: 0x7fe3c9, pants: 0x3b3355, style: 'short' }, decor: 'Camera đang quay bạn đó, cười lên nào!',
+    lines: ['Chào bạn! Camera nhà mình xoay 360 độ, có màu cả ban đêm.', 'Nhà, cửa hàng hay kho xưởng, bạn cần lắp ở đâu?', 'Gọi ' + SHOP.hotline + ' để được tư vấn lắp đặt nha!'] },
+  { id: 'monitor', name: 'Màn Hình & Văn Phòng', desc: 'Màn hình ASUS và PC văn phòng', side: 'N', x: 33, color: 0xffd666, trim: 0xffffff, roofC: 0xffb830, roof: 'gable', mascot: 'monitor', bg: 0xfff6d9, wall: 0xffe8a3, floorA: 0xfffaea, floorB: 0xffefbf, kind: 'tech', ped: 'pillar', products: ['mon1', 'mon4', 'mon3', 'off1', 'off2'], staff: { hair: 0xb0703a, shirt: 0xffd666, pants: 0x6f8fd6, style: 'twin' }, decor: 'Chiếc túi lười vàng ươm, ngồi ngắm màn hình đẹp ghê.',
+    lines: ['Chào bạn! Màn hình gaming hay màn hình đồ họa, bạn cần loại nào?', 'PC văn phòng bên mình cài sẵn Windows bản quyền đó.', 'Cần gì cứ hỏi, hotline ' + SHOP.hotline + ' luôn sẵn sàng!'] },
+  { id: 'cafe', name: 'Cà Phê Mây', desc: 'Ngồi uống nước và thử laptop', side: 'S', x: -33, color: 0xffb27a, trim: 0xfff4e8, roofC: 0xff8f4d, roof: 'dome', mascot: 'cup', bg: 0xfff0e2, wall: 0xffd9bd, floorA: 0xfff4ea, floorB: 0xffe3cc, kind: 'cafe', ped: 'table', products: ['lap1', 'mon2', 'off3'], staff: { hair: 0x5b3a4a, shirt: 0xffffff, pants: 0x8b5a3c, style: 'bun', apron: 0xff8f4d }, decor: 'Bạn nhấp một ngụm cà phê muối, thơm và béo ngậy.',
+    lines: ['Chào bạn! Hôm nay bạn uống gì nào, cà phê muối hay bạc xỉu?', 'Mấy bàn có thiết bị là hàng của Giang Huy PC, bạn cứ thử nhé.', 'Ngồi làm việc ở đây rất thích, wifi mạnh lắm!'] },
+  { id: 'market', name: 'Siêu Thị Mini Bắp', desc: 'Mua sắm và xem camera, PC gaming', side: 'S', x: -11, color: 0x8fd3ff, trim: 0xffffff, roofC: 0x5fb8f0, roof: 'flat', mascot: 'cart', bg: 0xe8f6ff, wall: 0xc4e7ff, floorA: 0xf2faff, floorB: 0xdcf0ff, kind: 'market', ped: 'crate', products: ['cam6', 'cam1', 'pc2'], staff: { hair: 0x3b3355, shirt: 0x8fd3ff, pants: 0x3b3355, style: 'cap', hat: 0x5fb8f0 }, decor: 'Bạn đẩy xe hàng vòng vòng, vui ghê.',
+    lines: ['Chào bạn! Siêu thị mini có đủ thứ, kể cả camera an ninh.', 'Mấy thùng hàng ở giữa là sản phẩm của Giang Huy PC đó.', 'Mua gì thì nhớ lấy giỏ nha!'] },
+  { id: 'food', name: 'Quán Phở Bông', desc: 'Phở nóng hổi và màn hình xem bóng đá', side: 'S', x: 11, color: 0xff9a8f, trim: 0xfff4e8, roofC: 0xf5675a, roof: 'gable', mascot: 'bowl', bg: 0xffeae6, wall: 0xffcdc6, floorA: 0xfff3f0, floorB: 0xffdcd6, kind: 'food', ped: 'table', products: ['mon4', 'off2', 'lap5'], staff: { hair: 0x2f2f4a, shirt: 0xffffff, pants: 0x3b3355, style: 'short', apron: 0xf5675a }, decor: 'Tô phở bốc khói thơm lừng, nhìn là thấy đói!',
+    lines: ['Chào bạn! Phở bò tái hay phở gà, bạn chọn món nào?', 'Bàn nào có màn hình là hàng của Giang Huy PC nha.', 'Ăn xong nhớ ghé mấy cửa hàng công nghệ bên kia đường!'] },
+  { id: 'boba', name: 'Trà Sữa Mochi', desc: 'Trà sữa trân châu và laptop, camera', side: 'S', x: 33, color: 0x9be3a5, trim: 0xffffff, roofC: 0x6fcf85, roof: 'dome', mascot: 'boba', bg: 0xeaffee, wall: 0xc8f2cf, floorA: 0xf4fff6, floorB: 0xdcf7e1, kind: 'boba', ped: 'table', products: ['lap2', 'cam2'], staff: { hair: 0xcfc2ff, shirt: 0xffffff, pants: 0x3b3355, style: 'twin', apron: 0x6fcf85 }, decor: 'Trà sữa trân châu, ít đá ít đường, ngon xỉu!',
+    lines: ['Chào bạn! Hôm nay bạn muốn thử trà sữa vị nào?', 'Trên bàn có laptop và camera của Giang Huy PC, bạn xem thử nhé.', 'Nhớ nhặt đủ sao ngoài phố để thành người dạo phố xịn nha!'] }
+];
+const TOTAL_PRODUCTS = new Set(SHOPS.flatMap((s) => s.products)).size;
+
+/* ================= RENDERER, VẬT LIỆU, TIỆN ÍCH ================= */
+const canvas = $('#gl');
+const renderer = new T.WebGLRenderer({ canvas: canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+const scene = new T.Scene();
+scene.background = new T.Color(0xbfe8ff);
+scene.fog = new T.Fog(0xd8f0ff, 70, 190);
+const camera = new T.PerspectiveCamera(45, 1, 0.1, 320);
+scene.add(new T.HemisphereLight(0xffffff, 0xcfe8d5, 0.95));
+const sun = new T.DirectionalLight(0xfff4e0, 0.75); sun.position.set(20, 40, 15); scene.add(sun);
+const roomLight = new T.PointLight(0xffe2b8, 0, 34); scene.add(roomLight);
+
+function resize() {
+  const w = canvas.clientWidth || 800, h = canvas.clientHeight || 600;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.fov = w / h < 0.8 ? 58 : 45;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+if (window.ResizeObserver) new ResizeObserver(resize).observe(canvas);
+
+const grad = new T.DataTexture(new Uint8Array([120, 195, 255]), 3, 1, T.LuminanceFormat);
+grad.minFilter = grad.magFilter = T.NearestFilter; grad.generateMipmaps = false; grad.needsUpdate = true;
+const mats = {};
+function M(c, o) {
+  const k = c + (o ? JSON.stringify(o) : '');
+  return mats[k] || (mats[k] = new T.MeshToonMaterial(Object.assign({ color: c, gradientMap: grad }, o || {})));
+}
+const OUT = new T.MeshBasicMaterial({ color: 0x4a3553, side: T.BackSide });
+const GB = new T.BoxGeometry(1, 1, 1), GS = new T.SphereGeometry(1, 22, 16), GC = new T.CylinderGeometry(1, 1, 1, 24);
+const GP = new T.PlaneGeometry(1, 1), GTOR = new T.TorusGeometry(1, 0.18, 8, 24);
+const GHAIR = new T.SphereGeometry(1, 24, 14, 0, Math.PI * 2, 0, 1.5);
+const GHEMI = new T.SphereGeometry(1, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2);
+const GBOWL = new T.SphereGeometry(1, 24, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
+function addOL(m, s) { const o = new T.Mesh(m.geometry, OUT); o.scale.setScalar(s); m.add(o); }
+function place(m, x, y, z, ol) { m.position.set(x || 0, y || 0, z || 0); if (ol) addOL(m, ol); return m; }
+function B(w, h, d, c, x, y, z, ol, o) { const m = new T.Mesh(GB, M(c, o)); m.scale.set(w, h, d); return place(m, x, y, z, ol); }
+function S(rx, ry, rz, c, x, y, z, ol, o) { const m = new T.Mesh(GS, M(c, o)); m.scale.set(rx, ry, rz); return place(m, x, y, z, ol); }
+function C(r, h, c, x, y, z, ol, o) { const m = new T.Mesh(GC, M(c, o)); m.scale.set(r, h, r); return place(m, x, y, z, ol); }
+function H(rx, ry, rz, c, x, y, z, ol) { const m = new T.Mesh(GHEMI, M(c, { side: T.DoubleSide })); m.scale.set(rx, ry, rz); return place(m, x, y, z, ol); }
+
+const hex = (n) => '#' + n.toString(16).padStart(6, '0');
+function rr(g, x, y, w, h, r) {
+  g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+  g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+}
+const lazies = [];
+function lazyTex(w, h, draw) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d'); const t = new T.CanvasTexture(c); t.anisotropy = 4;
+  const run = () => { g.clearRect(0, 0, w, h); draw(g, w, h); t.needsUpdate = true; };
+  run(); lazies.push(run); return t;
+}
+const VN = 'ĂÂÊÔƠƯăâêôơưĐđàáảãạằắẳẵặầấẩẫậèéẻẽẹềếểễệìíỉĩịòóỏõọồốổỗộờớởỡợùúủũụừứửữựỳýỷỹỵ';
+if (document.fonts && document.fonts.load) {
+  Promise.all([document.fonts.load('800 40px "Baloo 2"', VN), document.fonts.load('700 30px "Be Vietnam Pro"', VN)])
+    .then(() => lazies.forEach((f) => f())).catch(() => {});
+}
+const texC = {};
+function screenTex(i) {
+  const key = 's' + (i % 4);
+  if (texC[key]) return texC[key];
+  const c = document.createElement('canvas'); c.width = 256; c.height = 160;
+  const g = c.getContext('2d');
+  const pal = [['#ff9ec7', '#ffd9a0'], ['#8fe3cf', '#a7c7ff'], ['#c9b6ff', '#ffb3d1'], ['#ffe08a', '#ff9ec7']][i % 4];
+  const gr = g.createLinearGradient(0, 0, 256, 160); gr.addColorStop(0, pal[0]); gr.addColorStop(1, pal[1]);
+  g.fillStyle = gr; g.fillRect(0, 0, 256, 160);
+  g.fillStyle = 'rgba(255,255,255,.85)'; g.beginPath(); g.arc(70, 60, 26, 0, 7); g.fill();
+  g.fillStyle = 'rgba(255,255,255,.55)'; g.beginPath(); g.moveTo(0, 160); g.quadraticCurveTo(100, 70, 256, 150); g.lineTo(256, 160); g.fill();
+  return (texC[key] = new T.CanvasTexture(c));
+}
+function screenMesh(w, h, i) { const m = new T.Mesh(GP, new T.MeshBasicMaterial({ map: screenTex(i) })); m.scale.set(w, h, 1); return m; }
+const shTex = (function () {
+  const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d');
+  const gr = g.createRadialGradient(32, 32, 2, 32, 32, 32); gr.addColorStop(0, 'rgba(59,51,85,.45)'); gr.addColorStop(1, 'rgba(59,51,85,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return new T.CanvasTexture(c);
+})();
+const shMat = new T.MeshBasicMaterial({ map: shTex, transparent: true, depthWrite: false });
+function blob(r) { const m = new T.Mesh(GP, shMat); m.rotation.x = -Math.PI / 2; m.scale.set(r * 2, r * 2, 1); m.position.y = 0.06; return m; }
+
+function signTex(name, color, big) {
+  return lazyTex(512, 160, (g, w, h) => {
+    g.fillStyle = hex(color); rr(g, 6, 6, w - 12, h - 12, 38); g.fill();
+    g.lineWidth = 8; g.strokeStyle = '#ffffff'; g.stroke();
+    g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
+    let size = big || 64; g.font = '800 ' + size + 'px "Baloo 2","Be Vietnam Pro",sans-serif';
+    while (g.measureText(name).width > w - 70 && size > 28) { size -= 4; g.font = '800 ' + size + 'px "Baloo 2","Be Vietnam Pro",sans-serif'; }
+    g.strokeStyle = '#3b3355'; g.lineWidth = 12; g.strokeText(name, w / 2, h / 2 + 5);
+    g.fillStyle = '#ffffff'; g.fillText(name, w / 2, h / 2 + 5);
+  });
+}
+function tagSprite(p) {
+  const tex = lazyTex(512, 200, (g, w, h) => {
+    g.fillStyle = '#fffaf6'; rr(g, 8, 8, w - 16, h - 16, 40); g.fill();
+    g.lineWidth = 8; g.strokeStyle = '#3b3355'; g.stroke();
+    g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#3b3355';
+    let s = 42; g.font = '700 ' + s + 'px "Be Vietnam Pro",sans-serif';
+    while (g.measureText(p.short).width > w - 60 && s > 20) { s -= 2; g.font = '700 ' + s + 'px "Be Vietnam Pro",sans-serif'; }
+    g.fillText(p.short, w / 2, 70);
+    g.fillStyle = '#e0457d'; g.font = '800 60px "Baloo 2","Be Vietnam Pro",sans-serif'; g.fillText(p.price, w / 2, 142);
+  });
+  const sp = new T.Sprite(new T.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+  sp.scale.set(3.1, 1.21, 1); return sp;
+}
+
+/* ================= MÔ HÌNH SẢN PHẨM VÀ LINH VẬT ================= */
+function product(kind, i) {
+  const g = new T.Group();
+  if (kind === 'laptop') {
+    const col = [0xe9eef7, 0x9aa3c9, 0x3b3d57, 0xdfe3ee, 0xaab4d8][i % 5];
+    g.add(B(1.7, 0.1, 1.15, col, 0, 0.05, 0, 1.05));
+    g.add(B(1.4, 0.02, 0.5, 0x3b3355, 0, 0.11, 0.1));
+    const lid = new T.Group(); lid.position.set(0, 0.1, -0.55); lid.rotation.x = -0.28;
+    lid.add(B(1.7, 1.1, 0.08, col, 0, 0.55, 0, 1.04));
+    const sc = screenMesh(1.5, 0.92, i); sc.position.set(0, 0.55, 0.045); lid.add(sc);
+    g.add(lid);
+  } else if (kind === 'pc') {
+    g.add(B(0.95, 1.55, 1.2, 0x3b3355, 0, 0.78, 0, 1.04));
+    g.add(B(0.8, 1.38, 0.05, 0x22304f, 0, 0.8, 0.62, 0, { emissive: 0x1a2a4a }));
+    [[0.4, 0xff5c93], [0.8, 0x59e6c8], [1.2, 0xb69bff]].forEach((a) => {
+      const r = new T.Mesh(GTOR, M(a[1], { emissive: a[1] })); r.position.set(0, a[0], 0.67); r.scale.set(0.22, 0.22, 0.22); g.add(r);
+      g.add(S(0.06, 0.06, 0.04, a[1], 0, a[0], 0.67, 0, { emissive: a[1] }));
+    });
+  } else if (kind === 'office') {
+    g.add(B(0.8, 1.25, 1.0, 0xf2f4ff, 0, 0.63, 0, 1.05));
+    for (let k = 0; k < 4; k++) g.add(B(0.5, 0.04, 0.04, 0xc3cdee, 0, 0.35 + k * 0.1, 0.51));
+    g.add(B(0.6, 0.1, 0.04, 0xc3cdee, 0, 1.0, 0.51));
+    g.add(S(0.06, 0.06, 0.04, 0x59a8ff, 0.25, 0.75, 0.52, 0, { emissive: 0x59a8ff }));
+    g.add(S(0.05, 0.05, 0.04, 0xff8fb8, 0.35, 0.75, 0.52, 0, { emissive: 0xff8fb8 }));
+  } else if (kind === 'camera') {
+    g.add(C(0.5, 0.22, 0xffffff, 0, 0.11, 0, 1.06));
+    g.add(S(0.5, 0.46, 0.5, 0xffffff, 0, 0.7, 0, 1.06));
+    g.add(S(0.4, 0.3, 0.2, 0x2a2540, 0, 0.72, 0.36));
+    [-1, 1].forEach((s) => {
+      g.add(S(0.1, 0.1, 0.06, 0x7ff3ff, s * 0.15, 0.75, 0.52, 0, { emissive: 0x66e6ff }));
+      g.add(S(0.035, 0.035, 0.03, 0xffffff, s * 0.15 + 0.03, 0.79, 0.57));
+    });
+    g.add(S(0.04, 0.04, 0.04, 0xff5577, 0, 0.5, 0.46, 0, { emissive: 0xff5577 }));
+    g.add(S(0.04, 0.04, 0.04, 0x4d8cff, 0.1, 0.5, 0.45, 0, { emissive: 0x4d8cff }));
+  } else {
+    const col = [0x2a2540, 0x3b3d57, 0x2a2540, 0x44406a, 0x2a2540][i % 5];
+    g.add(B(1.9, 1.1, 0.1, col, 0, 1.15, 0, 1.04));
+    const sc = screenMesh(1.75, 0.95, i + 1); sc.position.set(0, 1.15, 0.056); g.add(sc);
+    g.add(B(0.14, 0.5, 0.1, 0x44406a, 0, 0.55, -0.05));
+    g.add(C(0.45, 0.06, 0x44406a, 0, 0.05, 0, 1.05));
+  }
+  return g;
+}
+const KSCALE = { laptop: 1.0, pc: 1.0, office: 1.1, camera: 1.35, monitor: 0.95 };
+function mascot(kind) {
+  if (PR.pc1 && ['pc', 'laptop', 'camera', 'monitor'].indexOf(kind) >= 0) return product(kind, 1);
+  const g = new T.Group();
+  if (kind === 'cup') {
+    g.add(C(0.85, 0.06, 0xffd9e6, 0, 0.03, 0));
+    g.add(C(0.55, 0.9, 0xffffff, 0, 0.5, 0, 1.06));
+    g.add(C(0.5, 0.08, 0x8b5a3c, 0, 0.96, 0));
+    const h = new T.Mesh(GTOR, M(0xffffff)); h.position.set(0.62, 0.55, 0); h.scale.set(0.28, 0.28, 0.28); g.add(h);
+    g.add(S(0.14, 0.14, 0.14, 0xffffff, -0.1, 1.3, 0, 0, { transparent: true, opacity: 0.8 }));
+    g.add(S(0.1, 0.1, 0.1, 0xffffff, 0.15, 1.6, 0, 0, { transparent: true, opacity: 0.7 }));
+  } else if (kind === 'cart') {
+    g.add(B(1.6, 0.8, 1.1, 0xdfe8f5, 0, 0.9, 0, 1.05));
+    g.add(B(1.7, 0.08, 0.08, 0xff8fb8, -0.05, 1.5, -0.6));
+    g.add(B(0.08, 0.7, 0.08, 0xff8fb8, -0.85, 1.15, -0.6));
+    [-0.6, 0.6].forEach((x) => g.add(S(0.17, 0.17, 0.17, 0x3b3355, x, 0.2, 0.3)));
+    g.add(S(0.28, 0.28, 0.28, 0xff8fb8, -0.3, 1.45, 0.1)); g.add(S(0.28, 0.28, 0.28, 0xffd666, 0.3, 1.45, 0));
+  } else if (kind === 'bowl') {
+    const b = new T.Mesh(GBOWL, M(0xffffff, { side: T.DoubleSide })); b.scale.set(0.85, 0.65, 0.85); b.position.y = 0.68; addOL(b, 1.05); g.add(b);
+    g.add(C(0.8, 0.05, 0xffd27f, 0, 0.66, 0)); g.add(S(0.55, 0.12, 0.55, 0xfff0c4, 0, 0.7, 0));
+    g.add(S(0.14, 0.1, 0.14, 0xff8f6a, 0.2, 0.84, 0.2)); g.add(S(0.14, 0.1, 0.14, 0x8fd9a8, -0.2, 0.84, -0.1));
+    [-0.08, 0.08].forEach((x) => { const s = B(0.05, 0.05, 1.3, 0xc08a5a, x + 0.4, 1.1, 0.2); s.rotation.x = 0.4; g.add(s); });
+  } else {
+    g.add(C(0.5, 1.1, 0xfff0f5, 0, 0.6, 0, 1.05, { transparent: true, opacity: 0.85 }));
+    g.add(C(0.46, 0.75, 0xffc4a0, 0, 0.45, 0));
+    for (let k = 0; k < 6; k++) g.add(S(0.09, 0.09, 0.09, 0x3b3355, Math.cos(k * 1.05) * 0.25, 0.13, Math.sin(k * 1.05) * 0.25));
+    g.add(S(0.52, 0.18, 0.52, 0xff8fb8, 0, 1.2, 0, 1.05));
+    const st = C(0.05, 1.6, 0xff8fb8, 0.12, 1.25, 0); st.rotation.z = 0.15; g.add(st);
+  }
+  return g;
+}
+
+/* ================= NHÂN VẬT CHIBI ================= */
+const PRESETS = [
+  { name: 'Hồng Đào', hair: 0x5b3a4a, shirt: 0xff8fb8, pants: 0x7a6fb0, style: 'bun' },
+  { name: 'Bạc Hà', hair: 0x2f2f4a, shirt: 0x7fe3c9, pants: 0x3b3355, style: 'short' },
+  { name: 'Nắng Vàng', hair: 0xb0703a, shirt: 0xffd666, pants: 0x6f8fd6, style: 'twin' },
+  { name: 'Tím Mộng', hair: 0xcfc2ff, shirt: 0xb9a6ff, pants: 0x3b3355, style: 'cap', hat: 0xff8fb8 }
+];
+function chibi(o) {
+  const g = new T.Group(), skin = o.skin || 0xffe3cf;
+  const body = new T.Group(); g.add(body);
+  const legs = [-1, 1].map((s) => {
+    const p = new T.Group(); p.position.set(s * 0.17, 0.5, 0);
+    p.add(C(0.11, 0.4, o.pants, 0, -0.2, 0, 1.14));
+    p.add(S(0.15, 0.1, 0.2, o.shoe || 0xffffff, 0, -0.42, 0.05, 1.12));
+    body.add(p); return p;
+  });
+  body.add(S(0.42, 0.42, 0.36, o.shirt, 0, 0.85, 0, 1.07));
+  if (o.apron) body.add(B(0.56, 0.5, 0.05, o.apron, 0, 0.78, 0.33));
+  const arms = [-1, 1].map((s) => {
+    const p = new T.Group(); p.position.set(s * 0.46, 1.05, 0);
+    p.add(C(0.09, 0.4, o.shirt, 0, -0.2, 0, 1.16));
+    p.add(S(0.1, 0.1, 0.1, skin, 0, -0.43, 0, 1.16));
+    body.add(p); return p;
+  });
+  const head = new T.Group(); head.position.y = 1.78; body.add(head);
+  head.add(S(0.7, 0.64, 0.64, skin, 0, 0, 0, 1.05));
+  const hairM = new T.Mesh(GHAIR, M(o.hair, { side: T.DoubleSide })); hairM.scale.set(0.76, 0.7, 0.74); hairM.position.set(0, 0.06, -0.04); addOL(hairM, 1.04); head.add(hairM);
+  head.add(S(0.72, 0.6, 0.46, o.hair, 0, -0.06, -0.24, 1.04));
+  [-0.4, 0, 0.4].forEach((x, k) => head.add(S(0.26, 0.12, 0.12, o.hair, x, 0.3 - Math.abs(x) * 0.15, 0.5, 1.05)));
+  [-1, 1].forEach((s) => {
+    head.add(S(0.085, 0.13, 0.05, 0x2a2540, s * 0.24, -0.08, 0.585));
+    head.add(S(0.03, 0.03, 0.02, 0xffffff, s * 0.24 + 0.03, -0.03, 0.63));
+    head.add(S(0.11, 0.06, 0.03, 0xff9db5, s * 0.4, -0.25, 0.45));
+  });
+  const mouth = new T.Mesh(new T.TorusGeometry(0.05, 0.013, 6, 12, Math.PI), M(0x7a3b4d)); mouth.rotation.z = Math.PI; mouth.position.set(0, -0.25, 0.57); head.add(mouth);
+  if (o.style === 'bun') [-1, 1].forEach((s) => head.add(S(0.2, 0.2, 0.2, o.hair, s * 0.5, 0.52, -0.05, 1.06)));
+  if (o.style === 'twin') [-1, 1].forEach((s) => head.add(S(0.18, 0.4, 0.18, o.hair, s * 0.68, -0.2, -0.1, 1.06)));
+  if (o.style === 'cap') {
+    const hat = new T.Mesh(GHAIR, M(o.hat || 0xff8fb8, { side: T.DoubleSide })); hat.scale.set(0.8, 0.74, 0.78); hat.position.set(0, 0.1, -0.03); addOL(hat, 1.04); head.add(hat);
+    head.add(B(0.8, 0.05, 0.5, o.hat || 0xff8fb8, 0, 0.22, 0.6, 1.06));
+  }
+  return { group: g, body: body, legs: legs, arms: arms, head: head };
+}
+function animChibi(c, moving, t, wave) {
+  const sw = moving ? Math.sin(t * 12) * 0.7 : 0;
+  c.legs[0].rotation.x = sw; c.legs[1].rotation.x = -sw;
+  c.arms[0].rotation.x = -sw * 0.8; c.arms[1].rotation.x = sw * 0.8;
+  c.arms[0].rotation.z = 0; c.arms[1].rotation.z = 0;
+  c.body.position.y = moving ? Math.abs(Math.sin(t * 12)) * 0.08 : Math.sin(t * 2.2) * 0.02;
+  c.head.rotation.z = moving ? Math.sin(t * 6) * 0.05 : Math.sin(t * 1.7) * 0.03;
+  if (wave > 0) { c.arms[1].rotation.x = -2.6; c.arms[1].rotation.z = Math.sin(t * 14) * 0.35; }
+}
+
+/* ================= THẾ GIỚI ================= */
+const worlds = {};
+let world = 'street';
+const GYS = 0.05;
+
+/* ---- phố ---- */
+const street = new T.Group(); scene.add(street);
+const SW = { cols: [], circ: [], inter: [], bounds: { minX: -52, maxX: 52, minZ: -27, maxZ: 27 }, bg: 0xbfe8ff };
+worlds.street = SW;
+const spinStreet = [];
+
+(function buildStreet() {
+  const ground = new T.Mesh(new T.PlaneGeometry(420, 420), M(0xb9e8a2)); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.05; street.add(ground);
+  street.add(B(140, 0.1, 9.2, 0x6f6c90, 0, 0, 0));
+  [-1, 1].forEach((s) => {
+    street.add(B(140, 0.14, 3.9, 0xf6ebdc, 0, 0, s * 6.55));
+    street.add(B(140, 0.16, 0.22, 0xffffff, 0, 0, s * 4.6));
+  });
+  for (let x = -62; x <= 62; x += 4) street.add(B(2, 0.02, 0.25, 0xfff2c4, x, 0.06, 0));
+  [-9, 9].forEach((x) => { for (let i = 0; i < 6; i++) street.add(B(1.8, 0.02, 0.6, 0xffffff, x, 0.06, -3.5 + i * 1.4)); });
+  street.add(C(7.2, 0.06, 0xffffff, 0, 0.03, 0));
+  street.add(C(6.5, 0.08, 0xffd9e6, 0, 0.05, 0, 1.01));
+  // đài phun nước
+  street.add(C(2.1, 0.5, 0xffffff, 0, 0.3, 0, 1.05));
+  street.add(C(1.8, 0.1, 0x8fdcff, 0, 0.58, 0, 0, { emissive: 0x3aa0d8 }));
+  street.add(C(0.35, 1.4, 0xffffff, 0, 1.2, 0));
+  street.add(C(1.0, 0.2, 0xffffff, 0, 1.9, 0, 1.05));
+  street.add(C(0.85, 0.06, 0x8fdcff, 0, 2.02, 0, 0, { emissive: 0x3aa0d8 }));
+  for (let k = 0; k < 4; k++) { const j = S(0.16, 0.16, 0.16, 0xbfeaff, Math.cos(k * 1.57) * 0.55, 2.4, Math.sin(k * 1.57) * 0.55, 0, { emissive: 0x7fcfff }); j.userData.k = k; street.add(j); spinStreet.push({ fn: 'jet', o: j }); }
+  SW.circ.push([0, 0, 2.2]);
+  SW.inter.push({ x: 0, z: 0, r: 3.9, label: 'Ước một điều', type: 'say', data: { who: 'Đài phun nước', text: 'Bạn ném một đồng xu và ước Giang Huy PC bán thật đắt hàng!' } });
+
+  // cổng chào
+  [-1, 1].forEach((s) => { street.add(B(0.9, 5, 0.9, 0xff8fb8, -48.5, 2.5, s * 5.6, 1.04)); SW.cols.push([-49, -48, s * 5.6 - 0.5, s * 5.6 + 0.5]); });
+  street.add(B(0.6, 1.9, 12.2, 0xffffff, -48.5, 5.3, 0, 1.03));
+  const arch = new T.Mesh(GP, new T.MeshBasicMaterial({ map: signTex('Phố Chibi Giang Huy PC', 0xff8fb8, 56), transparent: true }));
+  arch.scale.set(11.6, 1.8, 1); arch.rotation.y = Math.PI / 2; arch.position.set(-48.18, 5.3, 0); street.add(arch);
+
+  // bảng chào mừng
+  const bd = new T.Group(); bd.position.set(-6.5, 0, 6.9); bd.rotation.y = Math.PI;
+  [-1, 1].forEach((s) => bd.add(B(0.18, 1.6, 0.18, 0x9b6b4a, s * 1.1, 0.8, 0)));
+  bd.add(B(2.8, 1.5, 0.16, 0xfff3d6, 0, 1.8, 0, 1.04));
+  const bt = lazyTex(512, 280, (g, w, h) => {
+    g.fillStyle = '#fff3d6'; g.fillRect(0, 0, w, h); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#3b3355';
+    g.font = '800 62px "Baloo 2","Be Vietnam Pro",sans-serif'; g.fillText('Chào mừng bạn!', w / 2, 70);
+    g.font = '700 34px "Be Vietnam Pro",sans-serif'; g.fillStyle = '#e0457d'; g.fillText('Giang Huy PC', w / 2, 140);
+    g.fillStyle = '#7a7094'; g.font = '600 26px "Be Vietnam Pro",sans-serif'; g.fillText('Bấm để đọc thông tin liên hệ', w / 2, 205);
+  });
+  const bp = new T.Mesh(GP, new T.MeshBasicMaterial({ map: bt })); bp.scale.set(2.6, 1.3, 1); bp.position.set(0, 1.8, 0.09); bd.add(bp);
+  street.add(bd);
+  SW.inter.push({ x: -6.5, z: 6.0, r: 3.2, label: 'Đọc bảng chào mừng', type: 'info' });
+
+  // cây
+  const pinks = [0xffb7d5, 0xffc8e0], greens = [0x8fd9a8, 0xa6e3a1];
+  [[-22, -15], [0, -15], [22, -15], [-22, 15], [0, 15], [22, 15], [-45, -14], [45, -14], [-45, 14], [45, 14], [-44, -6.7], [44, -6.7], [-44, 6.7], [44, 6.7], [-30, -22], [30, -22], [-30, 22], [30, 22], [0, -22], [0, 22]].forEach((p, i) => {
+    const s = 1 + (i % 3) * 0.15, col = i % 2 ? pinks[i % 2] : greens[(i >> 1) % 2], g = new T.Group(); g.position.set(p[0], 0, p[1]);
+    g.add(C(0.22 * s, 1.5 * s, 0x9b6b4a, 0, 0.75 * s, 0));
+    g.add(S(1.5 * s, 1.3 * s, 1.5 * s, col, 0, 2.2 * s, 0, 1.04));
+    g.add(S(0.9 * s, 0.8 * s, 0.9 * s, col, 0.9 * s, 2.6 * s, 0.2 * s));
+    g.add(S(0.8 * s, 0.7 * s, 0.8 * s, col, -0.8 * s, 2.5 * s, -0.2 * s));
+    g.add(blob(1.3 * s)); street.add(g); SW.circ.push([p[0], p[1], 0.55]);
+  });
+  // đèn đường và ghế đá
+  [-40, -24, -8, 8, 24, 40].forEach((x) => [-1, 1].forEach((s) => {
+    street.add(C(0.1, 3.2, 0x3b3355, x, 1.6, s * 4.95));
+    street.add(S(0.36, 0.36, 0.36, 0xfff2c0, x, 3.3, s * 4.95, 0, { emissive: 0xffe6a0 }));
+    SW.circ.push([x, s * 4.95, 0.25]);
+  }));
+  [[-6, 6.0, 1], [6, 6.0, 1], [-6, -6.0, -1], [6, -6.0, -1]].forEach((b) => {
+    const g = new T.Group(); g.position.set(b[0], 0, b[1]);
+    g.add(B(2, 0.15, 0.7, 0xc08a5a, 0, 0.55, 0)); g.add(B(2, 0.6, 0.1, 0xc08a5a, 0, 0.95, b[2] * 0.32));
+    [-0.8, 0.8].forEach((x) => g.add(B(0.1, 0.5, 0.6, 0x3b3355, x, 0.28, 0)));
+    street.add(g); SW.cols.push([b[0] - 1.1, b[0] + 1.1, b[1] - 0.45, b[1] + 0.45]);
+  });
+})();
+
+/* ---- tòa nhà mặt phố ---- */
+function shopBuilding(cfg) {
+  const g = new T.Group(); const W = 14, D = 11, Hh = 5.6;
+  g.add(B(W, Hh, D, cfg.color, 0, Hh / 2, 0, 1.015));
+  g.add(B(W + 0.5, 0.55, D + 0.5, cfg.trim, 0, 0.27, 0));
+  if (cfg.roof === 'gable') {
+    const th = 0.5, L = (D / 2 + 0.7) / Math.cos(th), rise = L * Math.sin(th), cz = (L * Math.cos(th)) / 2;
+    [1, -1].forEach((s) => { const sl = B(W + 1, 0.3, L, cfg.roofC, 0, Hh + rise / 2, s * cz, 1.02); sl.rotation.x = s * th; g.add(sl); });
+    const sh = new T.Shape(); sh.moveTo(-D / 2 - 0.4, 0); sh.lineTo(D / 2 + 0.4, 0); sh.lineTo(0, rise); sh.closePath();
+    [-1, 1].forEach((s) => { const cap = new T.Mesh(new T.ShapeGeometry(sh), M(cfg.color, { side: T.DoubleSide })); cap.rotation.y = Math.PI / 2; cap.position.set(s * (W / 2 + 0.45), Hh, 0); g.add(cap); });
+    cfg._roofY = Hh + rise + 0.2;
+  } else if (cfg.roof === 'dome') {
+    g.add(H(W * 0.53, 3.2, D * 0.6, cfg.roofC, 0, Hh, 0, 1.02)); cfg._roofY = Hh + 3.1;
+  } else {
+    g.add(B(W + 0.8, 0.5, D + 0.8, cfg.roofC, 0, Hh + 0.25, 0, 1.02)); cfg._roofY = Hh + 0.5;
+  }
+  const mc = mascot(cfg.mascot); mc.scale.setScalar(2.0); mc.position.set(0, cfg._roofY, 0); g.add(mc); spinStreet.push({ fn: 'spin', o: mc, s: 0.5 });
+  const fz = D / 2;
+  g.add(B(3.1, 3.7, 0.14, 0xffffff, 0, 1.85, fz + 0.02));
+  g.add(B(2.4, 3.2, 0.2, cfg.roofC, 0, 1.6, fz + 0.1, 1.05));
+  g.add(S(0.1, 0.1, 0.1, 0xffd36b, 0.8, 1.55, fz + 0.26));
+  [-1, 1].forEach((s) => {
+    g.add(B(3.5, 2.7, 0.1, 0xffffff, s * 4.3, 2.3, fz + 0.02));
+    g.add(B(3.0, 2.2, 0.16, 0xfff0b8, s * 4.3, 2.3, fz + 0.1, 0, { emissive: 0xffe9a0 }));
+    g.add(B(0.1, 2.2, 0.2, 0xffffff, s * 4.3, 2.3, fz + 0.14)); g.add(B(3.0, 0.1, 0.2, 0xffffff, s * 4.3, 2.3, fz + 0.14));
+  });
+  const n = 7;
+  for (let i = 0; i < n; i++) {
+    const a = B(W / n + 0.02, 0.2, 1.9, i % 2 ? 0xffffff : cfg.roofC, -W / 2 + (i + 0.5) * (W / n), 3.95, fz + 0.9);
+    a.rotation.x = 0.32; g.add(a);
+  }
+  g.add(B(7.6, 1.4, 0.3, 0xffffff, 0, 5.0, fz + 0.1, 1.04));
+  const sp = new T.Mesh(GP, new T.MeshBasicMaterial({ map: cfg.signTex })); sp.scale.set(7.2, 1.25, 1); sp.position.set(0, 5.0, fz + 0.27); g.add(sp);
+  [-1, 1].forEach((s) => { g.add(C(0.4, 0.5, 0xffffff, s * 2.1, 0.25, fz + 0.9, 1.06)); g.add(S(0.5, 0.45, 0.5, s > 0 ? 0xff8fb8 : 0xffd666, s * 2.1, 0.75, fz + 0.9)); });
+  return g;
+}
+
+SHOPS.forEach((cfg, idx) => {
+  cfg.idx = idx; cfg.signTex = signTex(cfg.name, cfg.color, 64);
+  const b = shopBuilding(cfg);
+  const cz = cfg.side === 'N' ? -14 : 14;
+  b.position.set(cfg.x, 0, cz); b.rotation.y = cfg.side === 'N' ? 0 : Math.PI; street.add(b);
+  SW.cols.push([cfg.x - 7.2, cfg.x + 7.2, cz - 5.7, cz + 5.7]);
+  cfg.doorZ = cfg.side === 'N' ? -7.2 : 7.2;
+  SW.inter.push({ x: cfg.x, z: cfg.doorZ, r: 2.5, label: 'Vào ' + cfg.name, type: 'enter', data: cfg.id });
+});
+
+/* ---- bầu trời, xe, người đi bộ, sao ---- */
+const clouds = [];
+for (let i = 0; i < 9; i++) {
+  const g = new T.Group(), m = new T.MeshBasicMaterial({ color: 0xffffff });
+  [[0, 0, 0, 3], [2.4, -0.3, 0.4, 2.3], [-2.4, -0.4, 0, 2.2], [0.8, 0.9, 0, 2]].forEach((a) => { const s = new T.Mesh(GS, m); s.scale.set(a[3], a[3] * 0.7, a[3] * 0.8); s.position.set(a[0], a[1], a[2]); g.add(s); });
+  g.position.set(-90 + i * 24, 26 + (i % 3) * 5, -40 - (i % 4) * 14); g.userData.v = 0.5 + (i % 3) * 0.25; street.add(g); clouds.push(g);
+}
+function makeCar(color) {
+  const g = new T.Group();
+  g.add(B(1.7, 0.9, 3.2, color, 0, 0.8, 0, 1.06));
+  g.add(S(0.85, 0.7, 1.0, color, 0, 1.45, -0.15, 1.06));
+  g.add(B(1.75, 0.4, 0.9, 0xbfe8ff, 0, 1.5, -0.15));
+  [-1, 1].forEach((sx) => [-1, 1].forEach((sz) => { const w = new T.Mesh(GC, M(0x3b3355)); w.scale.set(0.42, 0.35, 0.42); w.rotation.z = Math.PI / 2; w.position.set(sx * 0.9, 0.42, sz * 1.0); g.add(w); }));
+  [-1, 1].forEach((s) => g.add(S(0.17, 0.17, 0.1, 0xfff2a0, s * 0.5, 0.85, 1.62, 0, { emissive: 0xfff2a0 })));
+  g.add(blob(1.7)); return g;
+}
+const cars = [];
+[[0xff8fb8, -3.1, 1, -50, 5.5], [0x7fe3c9, -3.1, 1, 10, 4.5], [0xffd666, 3.1, -1, 40, 5], [0xb9a6ff, 3.1, -1, -30, 6]].forEach((a) => {
+  const c = makeCar(a[0]); c.position.set(a[3], GYS, a[1]); c.rotation.y = a[2] > 0 ? Math.PI / 2 : -Math.PI / 2; c.userData = { dir: a[2], v: a[4] }; street.add(c); cars.push(c);
+});
+const walkers = [];
+[[0xff9a8f, -6.5, -30, 30, 1.7], [0x8fd3ff, 6.5, 30, -30, 1.4], [0x9be3a5, -6.6, 10, 40, 1.9], [0xffd666, 6.4, -10, -40, 1.5]].forEach((a, i) => {
+  const c = chibi({ hair: [0x3b3355, 0x8b5a3c, 0xcfc2ff, 0x5b3a4a][i], shirt: a[0], pants: 0x6f6c90, style: ['short', 'bun', 'twin', 'cap'][i], hat: 0xff8fb8 });
+  c.group.position.set(a[2], GYS, a[1]); c.group.add(blob(0.6)); street.add(c.group);
+  walkers.push({ c: c, z: a[1], a: Math.min(a[2], a[3]), b: Math.max(a[2], a[3]), dir: a[3] > a[2] ? 1 : -1, v: a[4], x: a[2] });
+});
+const starShape = new T.Shape();
+for (let i = 0; i < 10; i++) { const an = i * Math.PI / 5 + Math.PI / 2, r = i % 2 ? 0.22 : 0.5, x = Math.cos(an) * r, y = Math.sin(an) * r; if (i) starShape.lineTo(x, y); else starShape.moveTo(x, y); }
+starShape.closePath();
+const GSTAR = new T.ExtrudeGeometry(starShape, { depth: 0.16, bevelEnabled: false }); GSTAR.translate(0, 0, -0.08);
+const stars = [];
+[[-40, -6.3], [-26, 6.3], [-16, -6.3], [-4, 6.5], [0, -12], [6, -6.3], [16, 6.3], [26, -6.3], [40, 6.3], [44, -6.3], [22, 0], [-22, -12]].forEach((p) => {
+  const m = new T.Mesh(GSTAR, M(0xffd666, { emissive: 0xffb830 })); m.scale.setScalar(1.5); m.position.set(p[0], 1.5, p[1]); addOL(m, 1.12); street.add(m); stars.push(m);
+});
+const tapMark = new T.Mesh(new T.TorusGeometry(0.5, 0.06, 8, 24), new T.MeshBasicMaterial({ color: 0xff8fb8 })); tapMark.rotation.x = Math.PI / 2; tapMark.visible = false; scene.add(tapMark);
+
+/* ---- bên trong cửa hàng ---- */
+function slotsFor(n) {
+  if (n <= 1) return [[0, -3.6]];
+  if (n === 2) return [[-3, -3.6], [3, -3.6]];
+  if (n === 3) return [[-5.5, -3.8], [0, -3.8], [5.5, -3.8]];
+  if (n === 4) return [[-3, -4.4], [3, -4.4], [-3, -0.6], [3, -0.6]];
+  if (n === 5) return [[-5.5, -4.4], [0, -4.4], [5.5, -4.4], [-3, -0.6], [3, -0.6]];
+  return [[-5.5, -4.4], [0, -4.4], [5.5, -4.4], [-5.5, -0.6], [0, -0.6], [5.5, -0.6]];
+}
+function buildInterior(cfg, idx) {
+  const ox = 400, oz = idx * 40, RW = 18, RD = 14;
+  const root = new T.Group(); root.position.set(ox, 0, oz); root.visible = false; scene.add(root);
+  const W = { root: root, ox: ox, oz: oz, cols: [], circ: [], inter: [], spin: [], npc: null, cfg: cfg,
+    bounds: { minX: ox - 8.3, maxX: ox + 8.3, minZ: oz - 6.3, maxZ: oz + 6.6 }, spawn: { x: ox, z: oz + 4.2 }, bg: cfg.bg };
+  const colB = (a, b, c, d) => W.cols.push([ox + a, ox + b, oz + c, oz + d]);
+  const colC = (x, z, r) => W.circ.push([ox + x, oz + z, r]);
+  const itr = (x, z, r, label, type, data) => W.inter.push({ x: ox + x, z: oz + z, r: r, label: label, type: type, data: data });
+
+  root.add(B(RW + 1.2, 0.3, RD + 1.2, cfg.floorA, 0, -0.15, 0, 1.0));
+  for (let i = 0; i < 9; i++) root.add(B(2, 0.02, RD, i % 2 ? cfg.floorA : cfg.floorB, -8 + i * 2, 0.01, 0));
+  const wl = cfg.wall;
+  root.add(B(RW + 1.2, 4.8, 0.5, wl, 0, 2.4, -RD / 2 - 0.25, 1.01));
+  [-1, 1].forEach((s) => root.add(B(0.5, 4.8, RD + 1, wl, s * (RW / 2 + 0.25), 2.4, 0, 1.01)));
+  const sw = (RW - 3.6) / 2;
+  [-1, 1].forEach((s) => { root.add(B(sw, 1.0, 0.5, wl, s * (1.8 + sw / 2), 0.5, RD / 2 + 0.25, 1.03)); root.add(B(0.35, 1.6, 0.5, 0xffffff, s * 1.8, 0.8, RD / 2 + 0.25, 1.05)); });
+  root.add(B(RW, 0.4, 0.1, cfg.trim, 0, 0.2, -RD / 2 + 0.05));
+  const sg = new T.Mesh(GP, new T.MeshBasicMaterial({ map: cfg.signTex })); sg.scale.set(6.4, 2.0, 1); sg.position.set(0, 3.7, -RD / 2 + 0.05); root.add(sg);
+  [-7.4, 7.4].forEach((x) => root.add(S(0.32, 0.32, 0.32, 0xfff2c0, x, 3.4, -RD / 2 + 0.35, 0, { emissive: 0xffe6a0 })));
+  [-4.6, 4.6].forEach((x, k) => { const p = screenMesh(1.8, 1.2, k + idx); p.position.set(x, 2.9, -RD / 2 + 0.06); root.add(p); root.add(B(2.0, 1.4, 0.06, 0xffffff, x, 2.9, -RD / 2 + 0.03)); });
+  root.add(C(2.3, 0.04, cfg.color, 0, 0.04, 5.2));
+  [-1, 1].forEach((s) => { root.add(C(0.4, 0.5, 0xffffff, s * 8.0, 0.25, -5.9, 1.06)); root.add(S(0.6, 0.6, 0.6, 0x8fd9a8, s * 8.0, 0.95, -5.9, 1.05)); colC(s * 8.0, -5.9, 0.6); });
+  // kệ trang trí hai bên tường
+  const boxCols = [0xffb3d1, 0x9fd8ff, 0xffe08a, 0xc9b6ff, 0x9be3a5];
+  [-1, 1].forEach((s) => {
+    const z0 = s < 0 ? -5.5 : -5.5, zl = s < 0 ? 9 : 5;
+    [1.3, 2.6].forEach((y) => root.add(B(0.6, 0.12, zl, 0xffffff, s * 8.65, y, z0 + zl / 2)));
+    for (let k = 0; k < Math.floor(zl / 1.0); k++) [1.3, 2.6].forEach((y, j) => root.add(B(0.45, 0.55, 0.7, boxCols[(k + j + idx) % 5], s * 8.65, y + 0.33, z0 + 0.6 + k * 1.0)));
+  });
+  colB(-9, -8.2, -6.3, 3.5); colB(8.2, 9, -6.3, -0.5);
+  // quầy và nhân viên
+  root.add(B(4, 1.1, 1.4, cfg.color, 6.6, 0.55, 3.1, 1.04));
+  root.add(B(4.3, 0.15, 1.7, 0xffffff, 6.6, 1.15, 3.1, 1.04));
+  const reg = product('laptop', idx); reg.scale.setScalar(0.5); reg.position.set(5.6, 1.22, 3.1); reg.rotation.y = Math.PI; root.add(reg);
+  colB(4.5, 8.7, 2.3, 3.9);
+  const npc = chibi(cfg.staff); npc.group.position.set(6.6, 0, 4.6); npc.group.rotation.y = Math.PI; npc.group.add(blob(0.6)); root.add(npc.group);
+  W.npc = { c: npc, wave: 0, line: 0 };
+  itr(6.6, 3.1, 3.4, 'Trò chuyện với nhân viên', 'npc', cfg.id);
+  // bệ trưng bày
+  const slots = slotsFor(cfg.products.length);
+  cfg.products.forEach((pid, i) => {
+    const p = PR[pid], sx = slots[i][0], sz = slots[i][1], grp = new T.Group(); grp.position.set(sx, 0, sz); root.add(grp);
+    let base;
+    if (cfg.ped === 'table') {
+      grp.add(C(0.14, 0.85, 0xffffff, 0, 0.42, 0)); grp.add(C(1.05, 0.1, cfg.color, 0, 0.9, 0, 1.05)); grp.add(C(0.5, 0.06, 0xffffff, 0, 0.03, 0));
+      [-1, 1].forEach((s) => grp.add(C(0.36, 0.5, cfg.roofC, s * 1.55, 0.25, 0.3, 1.08))); base = 0.95;
+    } else if (cfg.ped === 'crate') {
+      grp.add(B(1.7, 0.8, 1.7, 0xffd9a0, 0, 0.4, 0, 1.05)); grp.add(B(1.74, 0.16, 0.3, 0xff8fb8, 0, 0.55, 0)); base = 0.8;
+    } else {
+      grp.add(C(1.0, 0.55, 0xffffff, 0, 0.275, 0, 1.06)); grp.add(C(1.1, 0.1, cfg.color, 0, 0.58, 0, 1.05)); base = 0.62;
+    }
+    const mdl = product(p.k, i); mdl.position.y = base; mdl.scale.setScalar(KSCALE[p.k] || 1); grp.add(mdl); W.spin.push(mdl);
+    const tg = tagSprite(p); tg.position.set(sx, base + 2.2, sz); root.add(tg);
+    colC(sx, sz, 1.15); itr(sx, sz, 2.5, 'Xem ' + p.short, 'product', pid);
+  });
+  // vật trang trí tương tác
+  const dg = new T.Group(); dg.position.set(-6.4, 0, 3.6); root.add(dg);
+  if (cfg.kind === 'tech') { dg.add(S(0.9, 0.6, 0.9, cfg.color, 0, 0.55, 0, 1.06)); dg.add(S(0.6, 0.55, 0.3, cfg.color, 0, 1.05, -0.55, 1.06)); }
+  else if (cfg.kind === 'market') { dg.add(B(1.5, 0.8, 1.0, 0xdfe8f5, 0, 0.9, 0, 1.05)); dg.add(B(1.6, 0.08, 0.08, 0xff8fb8, 0, 1.5, -0.55)); [-0.55, 0.55].forEach((x) => dg.add(S(0.17, 0.17, 0.17, 0x3b3355, x, 0.2, 0.3))); dg.add(S(0.28, 0.28, 0.28, 0xff8fb8, -0.3, 1.45, 0.1)); }
+  else {
+    dg.add(C(0.12, 0.85, 0xffffff, 0, 0.42, 0)); dg.add(C(0.9, 0.1, cfg.color, 0, 0.9, 0, 1.05));
+    const it = mascot(cfg.mascot); it.scale.setScalar(0.4); it.position.set(0, 0.95, 0); dg.add(it);
+  }
+  colC(-6.4, 3.6, 0.95);
+  itr(-6.4, 3.6, 2.3, cfg.kind === 'market' ? 'Đẩy xe hàng' : cfg.kind === 'tech' ? 'Ngồi thử' : 'Thưởng thức', 'say', { who: cfg.name, text: cfg.decor });
+  itr(0, 6.1, 1.7, 'Ra ngoài phố', 'exit');
+  worlds[cfg.id] = W; return W;
+}
+SHOPS.forEach((cfg, i) => buildInterior(cfg, i));
+
+/* ================= NGƯỜI CHƠI VÀ ĐIỀU KHIỂN ================= */
+const player = { c: null, pos: new T.Vector3(-3.5, GYS, 6.0), rot: Math.PI, moving: false };
+let preset = 0;
+function buildPlayer() {
+  if (player.c) scene.remove(player.c.group);
+  const c = chibi(PRESETS[preset]); c.group.add(blob(0.7)); scene.add(c.group); player.c = c;
+}
+buildPlayer();
+
+let camYaw = 0, camD = 11, camH = 9, started = false, target = null, curInter = null, fading = false, wave = 0;
+const keys = {}, stick = { x: 0, y: 0 };
+const ovs = ['startOv', 'prodOv', 'mapOv', 'contactOv', 'chatOv'];
+const anyOv = () => ovs.some((id) => !$('#' + id).hidden);
+const paused = () => !started || anyOv() || fading;
+
+function setWorld(id) {
+  world = id;
+  street.visible = id === 'street';
+  Object.keys(worlds).forEach((k) => { if (k !== 'street') worlds[k].root.visible = k === id; });
+  const w = worlds[id];
+  scene.background.set(w.bg); scene.fog.color.set(id === 'street' ? 0xd8f0ff : w.bg);
+  scene.fog.near = id === 'street' ? 70 : 60; scene.fog.far = id === 'street' ? 190 : 140;
+  if (id === 'street') roomLight.intensity = 0; else { roomLight.intensity = 0.55; roomLight.position.set(w.ox, 4.5, w.oz + 1); }
+  $('#loc').textContent = id === 'street' ? 'Quảng trường' : w.cfg.name;
+  tapMark.visible = false; target = null;
+}
+function transition(fn) {
+  fading = true; const f = $('#fade'); f.style.opacity = 1;
+  setTimeout(() => { fn(); f.style.opacity = 0; setTimeout(() => { fading = false; }, 280); }, 280);
+}
+function toStreet(cfg) {
+  setWorld('street');
+  player.pos.set(cfg.x, GYS, cfg.side === 'N' ? -6.0 : 6.0); player.rot = cfg.side === 'N' ? 0 : Math.PI; camYaw = 0;
+}
+function enterShop(id) {
+  transition(() => {
+    setWorld(id); const w = worlds[id]; player.pos.set(w.spawn.x, 0, w.spawn.z); player.rot = Math.PI; camYaw = 0;
+    w.npc.wave = 2.6; toast('Nhân viên', 'Chào mừng bạn đến với Giang Huy PC! Đến gần nhân viên rồi bấm E để trò chuyện.');
+  });
+}
+function exitShop() { const cfg = worlds[world].cfg; transition(() => toStreet(cfg)); }
+
+function setStarChip() { $('#starChip').textContent = 'Sao ' + stars.filter((s) => !s.visible).length + '/' + stars.length; }
+const seen = new Set();
+
+let toastTimer = 0;
+function toast(who, text) {
+  const t = $('#toast'); t.innerHTML = '<b></b><span></span>'; t.firstChild.textContent = who; t.lastChild.textContent = text;
+  t.style.opacity = 1; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.style.opacity = 0; }, 4200);
+}
+
+/* ---- thẻ sản phẩm, bản đồ, liên hệ ---- */
+function ico(k) {
+  if (k === 'laptop') return '<rect x="25" y="8" width="70" height="46" rx="4" fill="#3b3355"/><rect x="30" y="13" width="60" height="36" rx="2" fill="#ff9ec7"/><circle cx="48" cy="26" r="7" fill="#fff" opacity=".85"/><path d="M12 58h96l-8 10H20z" fill="#b9a6ff"/>';
+  if (k === 'pc') return '<rect x="12" y="8" width="38" height="66" rx="6" fill="#3b3355"/><circle cx="31" cy="26" r="9" fill="none" stroke="#ff5c93" stroke-width="3"/><circle cx="31" cy="52" r="9" fill="none" stroke="#59e6c8" stroke-width="3"/><rect x="60" y="14" width="52" height="34" rx="4" fill="#3b3355"/><rect x="64" y="18" width="44" height="26" fill="#c9b6ff"/><rect x="82" y="48" width="8" height="10" fill="#7a7094"/><rect x="72" y="58" width="28" height="4" rx="2" fill="#7a7094"/>';
+  if (k === 'office') return '<rect x="14" y="14" width="34" height="58" rx="5" fill="#f2f4ff" stroke="#3b3355" stroke-width="3"/><circle cx="36" cy="26" r="3" fill="#59a8ff"/><rect x="60" y="14" width="52" height="34" rx="4" fill="#3b3355"/><rect x="64" y="18" width="44" height="26" fill="#ffe08a"/><rect x="82" y="48" width="8" height="10" fill="#7a7094"/><rect x="72" y="58" width="28" height="4" rx="2" fill="#7a7094"/>';
+  if (k === 'camera') return '<ellipse cx="60" cy="66" rx="30" ry="8" fill="#fff" stroke="#3b3355" stroke-width="3"/><circle cx="60" cy="40" r="26" fill="#fff" stroke="#3b3355" stroke-width="3"/><rect x="40" y="30" width="40" height="22" rx="10" fill="#2a2540"/><circle cx="52" cy="41" r="5" fill="#7ff3ff"/><circle cx="68" cy="41" r="5" fill="#7ff3ff"/>';
+  return '<rect x="14" y="10" width="92" height="52" rx="5" fill="#3b3355"/><rect x="19" y="15" width="82" height="42" fill="#8fe3cf"/><circle cx="40" cy="30" r="8" fill="#fff" opacity=".85"/><rect x="54" y="62" width="12" height="8" fill="#7a7094"/><rect x="40" y="70" width="40" height="5" rx="2.5" fill="#7a7094"/>';
+}
+function openOv(id) { $('#' + id).hidden = false; const b = $('#' + id).querySelector('button, a'); if (b) b.focus(); }
+function closeOv(id) { $('#' + id).hidden = true; }
+function openProduct(pid) {
+  const p = PR[pid];
+  $('#prArt').innerHTML = '<svg viewBox="0 0 120 80" role="img" aria-label="' + p.cat + '">' + ico(p.k) + '</svg>';
+  $('#prCat').textContent = p.cat; $('#prName').textContent = p.name; $('#prPrice').textContent = p.price;
+  $('#prSpec').innerHTML = ''; p.spec.forEach((s) => { const li = document.createElement('li'); li.textContent = s; $('#prSpec').appendChild(li); });
+  $('#prLink').href = p.url; $('#prZalo').href = SHOP.zalo; $('#prHot').textContent = SHOP.hotline;
+  seen.add(pid); $('#seenChip').textContent = 'Đã xem ' + seen.size + '/' + TOTAL_PRODUCTS + ' sản phẩm';
+  openOv('prodOv');
+}
+function buildMap() {
+  const l = $('#mapList'); l.innerHTML = '';
+  SHOPS.forEach((cfg) => {
+    const it = document.createElement('div'); it.className = 'item';
+    const d = document.createElement('div'); const b = document.createElement('b'); b.textContent = cfg.name; const s = document.createElement('span'); s.textContent = cfg.desc; d.appendChild(b); d.appendChild(s);
+    const bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn mint'; bt.textContent = 'Tới đó';
+    bt.addEventListener('click', () => { closeOv('mapOv'); transition(() => toStreet(cfg)); });
+    it.appendChild(d); it.appendChild(bt); l.appendChild(it);
+  });
+}
+function buildContact() {
+  const rows = [['Hotline', SHOP.hotline], ['Email', SHOP.email], ['Địa chỉ', SHOP.address], ['Website', SHOP.site.replace('https://', '')]];
+  const box = $('#ctInfo'); box.innerHTML = '';
+  rows.forEach((r) => { const p = document.createElement('p'); const s = document.createElement('span'); s.className = 'sub'; s.textContent = r[0] + ': '; const b = document.createElement('b'); b.textContent = r[1]; p.appendChild(s); p.appendChild(b); box.appendChild(p); });
+  $('#ctZalo').href = SHOP.zalo; $('#ctMsg').href = SHOP.messenger; $('#ctSite').href = SHOP.site;
+}
+buildMap(); buildContact();
+
+/* ---- trò chuyện với nhân viên ---- */
+const STAFF = { gaming: 'Bé Hồng', laptop: 'Bé Tím', camera: 'Bé Bạc Hà', monitor: 'Bé Nắng', cafe: 'Bé Mây', market: 'Bé Bắp', food: 'Bé Bông', boba: 'Bé Mochi' };
+const TOPICS = [
+  ['Tư vấn PC gaming', 'Bên mình có PC gaming từ khoảng 14,6 triệu đến 32,8 triệu, từ Ryzen 5 đến card RTX 5060 Ti. Bạn cho mình biết ngân sách và game bạn hay chơi, mình gợi ý cấu hình nhé. Bạn cũng có thể bấm vào bệ trưng bày để xem giá thật.'],
+  ['Tư vấn laptop', 'Laptop có LG Gram mỏng nhẹ cho văn phòng và các dòng MSI Cyborg, Gigabyte AERO cho chơi game, đồ họa. Bạn dùng để học, làm việc hay chơi game để mình chọn giúp nhé.'],
+  ['Camera an ninh', 'Camera IMOU xoay 360 độ, nhiều độ phân giải từ 5MP đến 10MP, có màu ban đêm và đàm thoại 2 chiều, giá từ 1 triệu đồng. Bạn lắp ở nhà hay cửa hàng, mình tư vấn số lượng giúp bạn.'],
+  ['Hỏi giá, báo giá', 'Giá niêm yết nằm trên bảng của từng sản phẩm. Muốn báo giá chính xác và ưu đãi mới nhất, bạn nhắn Zalo hoặc Fanpage để nhân viên kiểm tra kho giúp bạn nhé.'],
+  ['Địa chỉ cửa hàng', 'Cửa hàng ở ' + SHOP.address + '. Hotline ' + SHOP.hotline + '.']
+];
+let chatShop = null, chatLast = '';
+function addMsg(who, text) {
+  const d = document.createElement('div'); d.className = 'msg ' + who; d.textContent = text;
+  const log = $('#chLog'); log.appendChild(d); log.scrollTop = log.scrollHeight;
+}
+const reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+function botSay(text) { setTimeout(() => addMsg('bot', text), reduce ? 0 : 350); }
+function openChat(id) {
+  chatShop = id; chatLast = '';
+  const cfg = worlds[id].cfg, name = STAFF[id] || 'Nhân viên';
+  $('#chName').textContent = name; $('#chShop').textContent = 'Nhân viên tại ' + cfg.name;
+  $('#chLog').innerHTML = '';
+  addMsg('bot', 'Chào mừng bạn đến với Giang Huy PC! Mình là ' + name + '. Bạn cần mình tư vấn gì nào?');
+  $('#chInput').value = ''; $('#chHot').textContent = SHOP.hotline;
+  $('#chFb').href = SHOP.fanpage; $('#chZalo').href = SHOP.zalo;
+  $('#chNote').firstChild.textContent = 'Hotline ';
+  openOv('chatOv');
+}
+function chatIntro(text) { chatLast = text; }
+(function () {
+  const box = $('#chChips');
+  TOPICS.forEach((t) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = t[0];
+    b.addEventListener('click', () => { addMsg('me', t[0]); chatIntro(t[0]); botSay(t[1]); });
+    box.appendChild(b);
+  });
+  $('#chForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const v = $('#chInput').value.trim(); if (!v) return;
+    addMsg('me', v); chatIntro(v); $('#chInput').value = '';
+    botSay('Cảm ơn bạn! Để nhân viên thật tư vấn kỹ và báo giá chính xác, bạn bấm "Nhắn Fanpage Facebook" hoặc "Chuyển sang Zalo" bên dưới. Nội dung bạn vừa nhập sẽ được sao chép sẵn, chỉ cần dán vào khung chat.');
+  });
+  $('#chClose').addEventListener('click', () => closeOv('chatOv'));
+  $('#chatOv').addEventListener('click', (e) => { if (e.target.id === 'chatOv') closeOv('chatOv'); });
+  function copyMsg(channel) {
+    const shop = chatShop ? worlds[chatShop].cfg.name : '';
+    const text = 'Chào Giang Huy PC, mình đang dạo phố chibi' + (shop ? ' và ghé ' + shop : '') + '. ' + (chatLast || 'Mình muốn được tư vấn sản phẩm.');
+    let ok = false;
+    try { navigator.clipboard.writeText(text).then(() => { $('#chNote').firstChild.textContent = 'Đã sao chép nội dung. Dán vào khung chat ' + channel + ' nhé. Hotline '; }, () => {}); ok = true; } catch (err) {}
+    $('#chNote').firstChild.textContent = (ok ? 'Đang mở ' + channel + ', nội dung đã được sao chép để bạn dán. ' : 'Đang mở ' + channel + '. ') + 'Hotline ';
+  }
+  $('#chFb').addEventListener('click', () => copyMsg('Facebook'));
+  $('#chZalo').addEventListener('click', () => copyMsg('Zalo'));
+})();
+
+/* ---- tương tác ---- */
+function talk(id) {
+  worlds[id].npc.wave = 2.2; openChat(id);
+}
+function doAct() {
+  if (paused() || !curInter) return;
+  const it = curInter;
+  if (it.type === 'enter') enterShop(it.data);
+  else if (it.type === 'exit') exitShop();
+  else if (it.type === 'product') openProduct(it.data);
+  else if (it.type === 'info') openOv('contactOv');
+  else if (it.type === 'npc') talk(it.data);
+  else if (it.type === 'say') toast(it.data.who, it.data.text);
+}
+$('#act').addEventListener('click', doAct);
+$('#mapBtn').addEventListener('click', () => { if (!paused()) openOv('mapOv'); });
+$('#contactBtn').addEventListener('click', () => { if (!paused()) openOv('contactOv'); });
+[['prClose', 'prodOv'], ['mapClose', 'mapOv'], ['ctClose', 'contactOv']].forEach((a) => $('#' + a[0]).addEventListener('click', () => closeOv(a[1])));
+ovs.slice(1).forEach((id) => $('#' + id).addEventListener('click', (e) => { if (e.target.id === id) closeOv(id); }));
+
+const picks = $('#picks');
+PRESETS.forEach((p, i) => {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'pick'; b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+  const dot = document.createElement('i'); dot.style.background = hex(p.shirt); b.appendChild(dot); b.appendChild(document.createTextNode(p.name));
+  b.addEventListener('click', () => { preset = i; buildPlayer(); picks.querySelectorAll('.pick').forEach((x, k) => x.setAttribute('aria-pressed', k === i ? 'true' : 'false')); });
+  picks.appendChild(b);
+});
+$('#startBtn').addEventListener('click', () => {
+  closeOv('startOv'); started = true;
+  setTimeout(() => { $('#hint').style.opacity = 0; }, 12000);
+});
+
+const KM = { KeyW: 'w', KeyA: 'a', KeyS: 's', KeyD: 'd', ArrowUp: 'w', ArrowLeft: 'a', ArrowDown: 's', ArrowRight: 'd' };
+window.addEventListener('keydown', (e) => {
+  if (KM[e.code]) { keys[KM[e.code]] = true; if (!paused()) e.preventDefault(); }
+  const onBtn = /^(BUTTON|A)$/.test(document.activeElement.tagName);
+  if (e.code === 'Escape') { for (let i = ovs.length - 1; i > 0; i--) if (!$('#' + ovs[i]).hidden) { closeOv(ovs[i]); break; } }
+  else if (e.code === 'KeyE' || (!onBtn && (e.code === 'Enter' || e.code === 'Space'))) { if (!paused()) { e.preventDefault(); doAct(); } }
+});
+window.addEventListener('keyup', (e) => { if (KM[e.code]) keys[KM[e.code]] = false; });
+window.addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
+
+// cần điều khiển
+const stickEl = $('#stick'), knob = $('#knob'); let stickId = null;
+if ((window.matchMedia && matchMedia('(pointer: coarse)').matches) || 'ontouchstart' in window) { stickEl.style.display = 'block'; $('#hint').textContent = 'Dùng cần bên trái để đi, kéo màn hình để xoay, bấm nút hồng để tương tác'; }
+function stickMove(e) {
+  const r = stickEl.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  let dx = (e.clientX - cx) / 46, dy = (e.clientY - cy) / 46; const m = Math.hypot(dx, dy); if (m > 1) { dx /= m; dy /= m; }
+  stick.x = dx; stick.y = dy; knob.style.transform = 'translate(' + dx * 34 + 'px,' + dy * 34 + 'px)';
+}
+stickEl.addEventListener('pointerdown', (e) => { stickId = e.pointerId; stickEl.setPointerCapture(e.pointerId); stickMove(e); e.preventDefault(); });
+stickEl.addEventListener('pointermove', (e) => { if (e.pointerId === stickId) stickMove(e); });
+const stickEnd = (e) => { if (e.pointerId === stickId) { stickId = null; stick.x = stick.y = 0; knob.style.transform = ''; } };
+stickEl.addEventListener('pointerup', stickEnd); stickEl.addEventListener('pointercancel', stickEnd);
+
+// kéo để xoay camera, chạm để đi tới
+const ray = new T.Raycaster(), plane = new T.Plane(new T.Vector3(0, 1, 0), 0), hitV = new T.Vector3();
+let drag = null;
+canvas.addEventListener('pointerdown', (e) => { drag = { id: e.pointerId, x: e.clientX, y: e.clientY, lx: e.clientX, moved: false, t: performance.now() }; canvas.setPointerCapture(e.pointerId); });
+canvas.addEventListener('pointermove', (e) => {
+  if (!drag || e.pointerId !== drag.id) return;
+  if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 7) drag.moved = true;
+  if (drag.moved && !paused()) camYaw -= (e.clientX - drag.lx) * 0.006;
+  drag.lx = e.clientX;
+});
+canvas.addEventListener('pointerup', (e) => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const d = drag; drag = null;
+  if (d.moved || paused() || performance.now() - d.t > 450) return;
+  const r = canvas.getBoundingClientRect();
+  ray.setFromCamera(new T.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), camera);
+  plane.constant = -(world === 'street' ? GYS : 0);
+  if (ray.ray.intersectPlane(plane, hitV)) { const b = worlds[world].bounds; target = { x: Math.max(b.minX, Math.min(b.maxX, hitV.x)), z: Math.max(b.minZ, Math.min(b.maxZ, hitV.z)) }; tapMark.position.set(target.x, plane.constant * -1 + 0.1, target.z); tapMark.visible = true; }
+});
+canvas.addEventListener('pointercancel', () => { drag = null; });
+
+/* ================= VÒNG LẶP ================= */
+function collide(w, p, r) {
+  for (let i = 0; i < w.cols.length; i++) {
+    const b = w.cols[i], cx = Math.max(b[0], Math.min(p.x, b[1])), cz = Math.max(b[2], Math.min(p.z, b[3]));
+    const dx = p.x - cx, dz = p.z - cz, d2 = dx * dx + dz * dz;
+    if (d2 < r * r) {
+      if (d2 > 1e-6) { const d = Math.sqrt(d2); p.x = cx + (dx / d) * r; p.z = cz + (dz / d) * r; }
+      else { const l = p.x - b[0], rt = b[1] - p.x, tp = p.z - b[2], bt = b[3] - p.z, m = Math.min(l, rt, tp, bt); if (m === l) p.x = b[0] - r; else if (m === rt) p.x = b[1] + r; else if (m === tp) p.z = b[2] - r; else p.z = b[3] + r; }
+    }
+  }
+  for (let i = 0; i < w.circ.length; i++) {
+    const c = w.circ[i], dx = p.x - c[0], dz = p.z - c[1], d = Math.hypot(dx, dz), m = c[2] + r;
+    if (d < m) { if (d > 1e-6) { p.x = c[0] + (dx / d) * m; p.z = c[1] + (dz / d) * m; } else p.x = c[0] + m; }
+  }
+  const b = w.bounds; p.x = Math.max(b.minX, Math.min(b.maxX, p.x)); p.z = Math.max(b.minZ, Math.min(b.maxZ, p.z));
+}
+function angLerp(a, b, k) { let d = ((b - a + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI; return a + d * k; }
+
+const clock = new T.Clock(); let time = 0, lastLabel = '';
+function update(dt) {
+  time += dt;
+  const w = worlds[world];
+  // di chuyển
+  let moving = false;
+  if (!paused()) {
+    let ix = (keys.d ? 1 : 0) - (keys.a ? 1 : 0) + stick.x, iz = (keys.w ? 1 : 0) - (keys.s ? 1 : 0) - stick.y;
+    let m = Math.hypot(ix, iz), dx = 0, dz = 0, spd = 0;
+    if (m > 0.12) {
+      target = null; tapMark.visible = false; if (m > 1) { ix /= m; iz /= m; m = 1; }
+      const fx = -Math.sin(camYaw), fz = -Math.cos(camYaw);
+      dx = -fz * ix + fx * iz; dz = fx * ix + fz * iz; spd = 6.4 * m;
+    } else if (target) {
+      const tx = target.x - player.pos.x, tz = target.z - player.pos.z, d = Math.hypot(tx, tz);
+      if (d < 0.25) { target = null; tapMark.visible = false; } else { dx = tx / d; dz = tz / d; spd = 6.4; }
+    }
+    if (spd > 0) {
+      const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l;
+      player.pos.x += dx * spd * dt; player.pos.z += dz * spd * dt; moving = true;
+      player.rot = angLerp(player.rot, Math.atan2(dx, dz), Math.min(1, dt * 14));
+    }
+    collide(w, player.pos, 0.5);
+  }
+  player.pos.y = world === 'street' ? GYS : 0;
+  player.c.group.position.copy(player.pos); player.c.group.rotation.y = player.rot;
+  animChibi(player.c, moving, time, 0);
+  if (tapMark.visible) { tapMark.rotation.z = time * 2; tapMark.scale.setScalar(1 + Math.sin(time * 6) * 0.08); }
+
+  // cảnh phố
+  if (world === 'street') {
+    clouds.forEach((c) => { c.position.x += c.userData.v * dt; if (c.position.x > 100) c.position.x = -100; });
+    cars.forEach((c) => { c.position.x += c.userData.dir * c.userData.v * dt; if (c.position.x > 62) c.position.x = -62; if (c.position.x < -62) c.position.x = 62; });
+    walkers.forEach((k) => {
+      k.x += k.dir * k.v * dt; if (k.x > k.b) { k.x = k.b; k.dir = -1; } if (k.x < k.a) { k.x = k.a; k.dir = 1; }
+      k.c.group.position.set(k.x, GYS, k.z); k.c.group.rotation.y = k.dir > 0 ? Math.PI / 2 : -Math.PI / 2; animChibi(k.c, true, time + k.z, 0);
+    });
+    stars.forEach((s, i) => {
+      if (!s.visible) return;
+      s.rotation.y = time * 2 + i; s.position.y = 1.5 + Math.sin(time * 2 + i) * 0.2;
+      if (!paused() && Math.hypot(s.position.x - player.pos.x, s.position.z - player.pos.z) < 1.4) {
+        s.visible = false; setStarChip();
+        const got = stars.filter((q) => !q.visible).length;
+        toast('Ting!', got === stars.length ? 'Bạn nhặt đủ 12 ngôi sao, giỏi quá! Ghé cửa hàng xem sản phẩm nhé.' : 'Nhặt được 1 ngôi sao (' + got + '/' + stars.length + ').');
+      }
+    });
+    spinStreet.forEach((s) => { if (s.fn === 'jet') s.o.position.y = 2.3 + Math.abs(Math.sin(time * 3 + s.o.userData.k * 1.5)) * 0.9; else s.o.rotation.y += dt * s.s; });
+  } else {
+    w.spin.forEach((m) => { m.rotation.y += dt * 0.7; });
+    const n = w.npc; if (n.wave > 0) n.wave -= dt;
+    animChibi(n.c, false, time, n.wave);
+  }
+
+  // camera
+  const tD = world === 'street' ? 11 : 8.6, tH = world === 'street' ? 9 : 7.6;
+  camD += (tD - camD) * Math.min(1, dt * 3); camH += (tH - camH) * Math.min(1, dt * 3);
+  if (world !== 'street') camYaw = Math.max(-0.7, Math.min(0.7, camYaw));
+  const cx = player.pos.x + Math.sin(camYaw) * camD, cz = player.pos.z + Math.cos(camYaw) * camD;
+  camera.position.x += (cx - camera.position.x) * Math.min(1, dt * 6);
+  camera.position.y += (camH - camera.position.y) * Math.min(1, dt * 6);
+  camera.position.z += (cz - camera.position.z) * Math.min(1, dt * 6);
+  camera.lookAt(player.pos.x, player.pos.y + 1.2, player.pos.z);
+
+  // gợi ý tương tác
+  let best = null, bd = 1e9;
+  if (!paused()) w.inter.forEach((it) => { const d = Math.hypot(it.x - player.pos.x, it.z - player.pos.z); if (d < it.r && d < bd) { bd = d; best = it; } });
+  curInter = best;
+  const btn = $('#act'), lab = best ? best.label : '';
+  if (lab !== lastLabel) {
+    lastLabel = lab; btn.hidden = !best;
+    if (best) { btn.textContent = lab + ' '; const k = document.createElement('kbd'); k.textContent = 'E'; btn.appendChild(k); }
+  }
+}
+function loop() {
+  requestAnimationFrame(loop);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  update(dt); renderer.render(scene, camera);
+}
+resize(); setWorld('street'); setStarChip();
+camera.position.set(player.pos.x, camH, player.pos.z + camD);
+loop();
+window.__phoChibi = { scene: scene };
+})();
+</script>
+
+</body></html>
